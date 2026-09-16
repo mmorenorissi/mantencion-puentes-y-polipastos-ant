@@ -2822,12 +2822,12 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
       <div class="choice-card" id="choiceInspeccion" data-servicio="inspeccion">
         <div class="icon">🔍</div>
         <h3>Inspección</h3>
-        <p>Pauta de 23 puntos · Informe de verificación</p>
+        <p>Pauta según el tipo de equipo (Puente Grúa, Polipasto, Tecle)</p>
       </div>
       <div class="choice-card" id="choiceMtto" data-servicio="mtto">
         <div class="icon">🛠️</div>
         <h3>Mantención</h3>
-        <p>Pauta genérica completa · Todos los intervalos</p>
+        <p>Misma pauta que Inspección, según tipo de equipo</p>
       </div>
     </div>
 
@@ -2901,7 +2901,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
         </div>
         <div class="row2">
           <div class="field"><label>Capacidad</label><input type="text" id="f_serie"></div>
-          <div class="field"><label>N° Interno / Placa</label><input type="text" id="f_interno"></div>
+          <div class="field"><label>N° Interno / TAG</label><input type="text" id="f_interno"></div>
         </div>
         <div class="row2">
           <div class="field"><label>Ubicación en Faena</label><input type="text" id="f_ubicacion"></div>
@@ -3106,11 +3106,11 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           </div>
         </div>
         <div class="row2">
-          <div class="field"><label>Nombre / ID</label><input type="text" id="eNombre" placeholder="Ej: Portátil N°8"></div>
-          <div class="field"><label>Marca</label><input type="text" id="eMarca" placeholder="Ej: Atlas Copco"></div>
+          <div class="field"><label>Nombre / ID</label><input type="text" id="eNombre" placeholder="Ej: Polipasto — CV03 CHP"></div>
+          <div class="field"><label>Marca</label><input type="text" id="eMarca" placeholder="Ej: ABUS"></div>
         </div>
         <div class="row2">
-          <div class="field"><label>Modelo</label><input type="text" id="eModelo" placeholder="Ej: XAS 98"></div>
+          <div class="field"><label>Modelo</label><input type="text" id="eModelo" placeholder="Ej: GM5000"></div>
           <div class="field"><label>Capacidad</label><input type="text" id="eSerie"></div>
         </div>
         <div class="row2">
@@ -4913,7 +4913,7 @@ async function openRemoteDetail(id){
     let html = `
       <div style="margin-bottom:10px;">
         <b>${esc(r.equipo||'')}</b><br>
-        <span style="color:var(--muted);">${esc(r.marca||'')} ${esc(r.modelo||'')} · Serie ${esc(r.serie||'—')}</span><br>
+        <span style="color:var(--muted);">${esc(r.marca||'')} ${esc(r.modelo||'')} · Capacidad ${esc(r.serie||'—')}</span><br>
         <span style="color:var(--muted);">Folio: ${esc(r.nroInforme||'—')} · ${esc(r.fecha||'')}</span><br>
         <span style="color:var(--muted);">Técnico(s): ${esc(r.tecnicos||'—')} · Supervisor: ${esc(r.supervisor||'—')}</span><br>
         <b style="color:var(--steel);">Estado: ${esc(r.estado||'—')}</b>
@@ -5341,7 +5341,7 @@ document.getElementById('btnCompartir').addEventListener('click', async () => {
   const ninforme = document.getElementById('f_ninforme').value || 's/n';
   const fecha = document.getElementById('f_fecha').value || '—';
   const horometro = document.getElementById('f_horometro').value || '—';
-  const texto = `${servicioLabel} — ${equipoNombre}\nFolio: ${ninforme}\nFecha: ${fecha} · Horómetro: ${horometro} h\n\nResultado: ${counts.bueno} Bueno / ${counts.regular} Regular / ${counts.malo} Malo\nEstado: ${estado.label}`;
+  const texto = `${servicioLabel} — ${equipoNombre}\nFolio: ${ninforme}\nFecha: ${fecha}${horometro ? ' · Horómetro/OT: ' + horometro : ''}\n\nResultado: ${counts.bueno} Bueno / ${counts.regular} Regular / ${counts.malo} Malo\nEstado: ${estado.label}`;
   // Respaldo: siempre queda copiado al portapapeles, aunque el share nativo no
   // rellene bien el correo (en computador a veces no carga el cuerpo del mensaje).
   if(navigator.clipboard){ try{ await navigator.clipboard.writeText(texto); }catch(e){} }
@@ -5434,7 +5434,7 @@ async function generarInformePDF(){
   [
     `Equipo: ${equipoNombre}`,
     `Marca/Modelo: ${marca} ${modelo}`,
-    `Serie: ${serie}`,
+    `Capacidad: ${serie}`,
     `N° Informe: ${ninforme}`,
     `N° de OT: ${ot}`,
     `Fecha: ${fecha}`,
@@ -5442,10 +5442,10 @@ async function generarInformePDF(){
     `Técnico(s): ${tecnico}`,
     `Supervisor: ${supervisor}`,
     `Hora inicio: ${horainicio}   Hora término: ${horatermino}`,
-    `N° Interno/Placa: ${interno}`,
+    `N° Interno/TAG: ${interno}`,
     `Ubicación: ${ubicacion}`,
-    `Horómetro actual: ${horometro}`
-  ].forEach(linea => { doc.text(linea, marginX, y); y += 5; });
+    horometro ? `Horómetro/OT: ${horometro}` : ''
+  ].filter(Boolean).forEach(linea => { doc.text(linea, marginX, y); y += 5; });
   doc.setFont('helvetica','bold');
   doc.text(`ESTADO: ${estado.label}`, marginX, y); y += 7;
   doc.setFont('helvetica','normal');
@@ -5647,7 +5647,7 @@ function buildPrintArea(){
       <b>1. Datos Generales</b> — N° Informe: ${esc(ninforme)} · Fecha: ${esc(fecha)} · Área: ${esc(area)} · Tipo de servicio: ${esc(tiposervicio)}<br>
       Técnico(s): ${esc(tecnico)} · Supervisor: ${esc(supervisor)} · Hora inicio: ${esc(horainicio)} · Hora término: ${esc(horatermino)}<br><br>
       <b>2. Datos del Equipo</b> — Marca: ${esc(marca)} · Modelo: ${esc(modelo)} · Capacidad: ${esc(serie)} · TAG: ${esc(interno)}<br>
-      N° Interno/Placa: ${esc(interno)} · Ubicación: ${esc(ubicacion)} · Horómetro actual: ${esc(horometro)}
+      Ubicación: ${esc(ubicacion)}
     </div>`;
 
   // 3. Verificación de componentes — SOLO ítems con estado Bueno/Regular/Malo
@@ -5775,7 +5775,7 @@ async function exportCSV(){
   try{
     const rows = await storage.allEntries('registro:');
     if(!rows.length){ toast('No hay registros para exportar'); return; }
-    const headers = ['Folio','Fecha','Servicio','Equipo','Marca','Modelo','Serie','Horómetro','Técnico','Supervisor','Estado','Bueno','Regular','Malo','N/A'];
+    const headers = ['Folio','Fecha','Servicio','Equipo','Marca','Modelo','Capacidad','Horómetro/OT','Técnico','Supervisor','Estado','Bueno','Regular','Malo','N/A'];
     const lines = [headers.join(';')];
     rows.forEach(r => {
       const rec = r.value;
