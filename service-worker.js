@@ -1,4 +1,4 @@
-const CACHE = 'mantenimiento-puentes-grua-ant-v2';
+const CACHE = 'mantenimiento-puentes-grua-ant-v3';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -32,24 +32,34 @@ self.addEventListener('fetch', e => {
   if (url.origin !== self.location.origin) return;
 
   e.respondWith(
-    caches.match(e.request).then(cached =>
-      cached ||
-      fetch(e.request)
-        .then(resp => {
-          // Solo guardar respuestas válidas del mismo origen.
-          if (resp && resp.ok) {
-            const copy = resp.clone();
-            caches.open(CACHE).then(c => c.put(e.request, copy));
-          }
-          return resp;
-        })
-        .catch(() => {
+    caches.open(CACHE).then(cache =>
+      cache.match(e.request).then(cached => {
+        // Siempre se pide la versión de red en paralelo y se guarda en caché,
+        // haya o no una copia previa. Así la próxima apertura ya tiene la
+        // versión nueva lista, sin esperar a que el navegador decida
+        // invalidar el caché por su cuenta (el gap que tenía ANT-105).
+        const network = fetch(e.request)
+          .then(resp => {
+            if (resp && resp.ok) cache.put(e.request, resp.clone());
+            return resp;
+          })
+          .catch(() => null);
+
+        if (cached) {
+          // Responde de inmediato con lo que ya está en caché; la
+          // actualización de red sigue en segundo plano sin bloquear esto.
+          network;
+          return cached;
+        }
+
+        // No hay nada cacheado todavía: hay que esperar la red.
+        return network.then(resp => {
+          if (resp) return resp;
           // El fallback a index.html se usa solo para navegación.
-          if (e.request.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
+          if (e.request.mode === 'navigate') return cache.match('./index.html');
           throw new Error('Recurso no disponible offline');
-        })
+        });
+      })
     )
   );
 });
