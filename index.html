@@ -2852,7 +2852,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           <select id="f_equipo"></select>
         </div>
         <div class="field" id="f_intervaloWrap" style="display:none;">
-          <label>Intervalo de mantención</label>
+          <label>Plan de Mantención</label>
           <select id="f_intervalo"></select>
         </div>
       </div>
@@ -2893,15 +2893,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           <div class="field"><label>Capacidad</label><input type="text" id="f_serie"></div>
           <div class="field"><label>N° Interno / TAG</label><input type="text" id="f_interno"></div>
         </div>
-        <div class="row2">
-          <div class="field"><label>Ubicación en Faena</label><input type="text" id="f_ubicacion"></div>
-          <div class="field"><label>Horómetro / N° OT SAP (opcional)</label><input type="text" inputmode="decimal" id="f_horometro"></div>
-        </div>
-        <div id="horometroWarning" style="display:none;background:var(--malo-bg);color:var(--malo);border-radius:8px;padding:9px 11px;font-size:12.5px;font-weight:600;margin-top:-4px;margin-bottom:11px;"></div>
-        <div class="field" id="horometroJustWrap" style="display:none;">
-          <label style="color:var(--malo);">Justificación (horómetro menor al último registrado)</label>
-          <textarea id="f_horometroJust" rows="2" style="width:100%;border:1.5px solid var(--malo-bg);border-radius:8px;padding:9px 11px;font-family:var(--font-body);font-size:14px;"></textarea>
-        </div>
+        <div class="field"><label>Ubicación en Faena</label><input type="text" id="f_ubicacion"></div>
         <div id="historialEquipoMini" style="display:none;"></div>
       </div>
     </div>
@@ -3779,9 +3771,6 @@ function applyEquipoToForm(equipo){
   document.getElementById('f_serie').value = equipo ? equipo.serie : '';
   document.getElementById('f_interno').value = equipo ? (equipo.interno || equipo.nombre) : '';
   document.getElementById('f_ubicacion').value = equipo ? equipo.ubicacion : '';
-  document.getElementById('horometroWarning').style.display = 'none';
-  document.getElementById('horometroJustWrap').style.display = 'none';
-  document.getElementById('f_horometroJust').value = '';
   renderHistorialEquipoMini(equipo);
   renderReferenciaMtto(equipo);
   renderRepuestosUsados();
@@ -3947,22 +3936,6 @@ async function renderHistorialEquipoMini(equipo){
   box.style.cssText = 'display:block;background:var(--paper);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--muted);margin-top:2px;';
   box.innerHTML = `<b style="color:${cls};">● Última inspección de este equipo:</b> ${esc(ultimo.fecha||'—')} · ${esc(ultimo.equipoLabel||'')} · <b style="color:${cls};">${estadoTxt}</b> (${previos.length} registro${previos.length>1?'s':''} en total)`;
 }
-
-document.getElementById('f_horometro').addEventListener('input', async () => {
-  const equipoId = document.getElementById('f_equipo').value;
-  const equipo = equipos.find(e => e.id === equipoId);
-  const warnBox = document.getElementById('horometroWarning');
-  const justWrap = document.getElementById('horometroJustWrap');
-  const val = parseFloat(document.getElementById('f_horometro').value);
-  if(equipo && equipo.ultimoHorometro != null && !isNaN(val) && val < equipo.ultimoHorometro){
-    warnBox.style.display = 'block';
-    warnBox.textContent = `⚠ El horómetro ingresado (${val}) es menor al último registrado para este equipo (${equipo.ultimoHorometro} h). Justifica para continuar.`;
-    justWrap.style.display = 'block';
-  } else {
-    warnBox.style.display = 'none';
-    justWrap.style.display = 'none';
-  }
-});
 
 document.getElementById('f_intervalo').addEventListener('change', (e) => {
   document.getElementById('f_tiposervicio').value = 'MANTENCIÓN — ' + e.target.value;
@@ -4154,8 +4127,6 @@ async function resumeDraft(draft){
   document.getElementById('f_serie').value = draft.serie || '';
   document.getElementById('f_interno').value = draft.interno || '';
   document.getElementById('f_ubicacion').value = draft.ubicacion || '';
-  document.getElementById('f_horometro').value = draft.horometro || '';
-  document.getElementById('f_horometroJust').value = draft.horometroJustificacion || '';
   document.getElementById('f_hallazgos').value = draft.hallazgos || '';
   document.getElementById('f_entregadoA').value = draft.entregadoA || '';
   document.getElementById('f_cargo').value = draft.cargo || '';
@@ -4216,7 +4187,6 @@ function startNewForm(servicio){
   document.getElementById('f_horainicio').value = nowTimeHHMM();
   document.getElementById('f_horatermino').value = '';
 
-  document.getElementById('f_horometro').value = '';
   document.getElementById('f_hallazgos').value = '';
   document.getElementById('f_entregadoA').value = '';
   document.getElementById('f_cargo').value = '';
@@ -4554,8 +4524,6 @@ function buildRecord(){
     serie: document.getElementById('f_serie').value,
     interno: document.getElementById('f_interno').value,
     ubicacion: document.getElementById('f_ubicacion').value,
-    horometro: document.getElementById('f_horometro').value,
-    horometroJustificacion: document.getElementById('f_horometroJust').value,
     items: itemState,
     itemsDescriptivos: buildItemsDescriptivos(),
     photos: photoState,
@@ -4638,8 +4606,6 @@ async function saveRecord(){
     renderPlannedMaintenance(equipoActual);
     return false;
   }
-  // Puentes Grua/Polipastos no usa horometro (mantencion por plan/calendario) — se quita la
-  // validacion obligatoria de horometro que traia la plantilla de Compresores.
   const equipoId = document.getElementById('f_equipo').value;
   if(!equipoId){ toast('✕ Selecciona un equipo antes de guardar.'); return false; }
   if(!document.getElementById('f_ot').value.trim()){ toast('✕ Falta indicar el N° de OT antes de guardar.'); return false; }
@@ -4652,15 +4618,6 @@ async function saveRecord(){
   try{
     await storage.set('registro:' + rec.id, rec);
     await updateIndex(rec);
-    // actualizar último horómetro del equipo para futuras validaciones — nunca hacia abajo,
-    // aunque se reabra y regrabe un informe antiguo con un valor menor (ya justificado).
-    const equipo = equipos.find(e => e.id === equipoId);
-    const horVal = parseFloat(document.getElementById('f_horometro').value);
-    if(equipo && !isNaN(horVal) && (equipo.ultimoHorometro == null || horVal > equipo.ultimoHorometro)){
-      equipo.ultimoHorometro = horVal;
-      equipo.ultimaFecha = rec.fecha;
-      await saveEquipos();
-    }
     document.getElementById('recIdLabel').textContent = 'guardado · ' + rec.id;
     document.getElementById('btnDelete').style.display = 'block';
     toast('✓ Guardado (' + sizeKB + ' KB)');
@@ -5036,8 +4993,6 @@ async function loadRecordIntoForm(id){
   document.getElementById('f_serie').value = rec.serie || '';
   document.getElementById('f_interno').value = rec.interno || '';
   document.getElementById('f_ubicacion').value = rec.ubicacion || '';
-  document.getElementById('f_horometro').value = rec.horometro || '';
-  document.getElementById('f_horometroJust').value = rec.horometroJustificacion || '';
   document.getElementById('f_hallazgos').value = rec.hallazgos || '';
   document.getElementById('f_entregadoA').value = rec.entregadoA || '';
   document.getElementById('f_cargo').value = rec.cargo || '';
@@ -5409,8 +5364,7 @@ document.getElementById('btnCompartir').addEventListener('click', async () => {
   const servicioLabel = currentServicio === 'inspeccion' ? 'Inspección' : 'Mantención';
   const ninforme = document.getElementById('f_ninforme').value || 's/n';
   const fecha = document.getElementById('f_fecha').value || '—';
-  const horometro = document.getElementById('f_horometro').value || '—';
-  const texto = `${servicioLabel} — ${equipoNombre}\nFolio: ${ninforme}\nFecha: ${fecha}${horometro ? ' · Horómetro/OT: ' + horometro : ''}\n\nResultado: ${counts.bueno} Bueno / ${counts.regular} Regular / ${counts.malo} Malo\nEstado: ${estado.label}`;
+  const texto = `${servicioLabel} — ${equipoNombre}\nFolio: ${ninforme}\nFecha: ${fecha}\n\nResultado: ${counts.bueno} Bueno / ${counts.regular} Regular / ${counts.malo} Malo\nEstado: ${estado.label}`;
   // Respaldo: siempre queda copiado al portapapeles, aunque el share nativo no
   // rellene bien el correo (en computador a veces no carga el cuerpo del mensaje).
   if(navigator.clipboard){ try{ await navigator.clipboard.writeText(texto); }catch(e){} }
@@ -5483,7 +5437,6 @@ async function generarInformePDF(){
   const serie = document.getElementById('f_serie').value || '—';
   const interno = document.getElementById('f_interno').value || '—';
   const ubicacion = document.getElementById('f_ubicacion').value || '—';
-  const horometro = document.getElementById('f_horometro').value || '—';
   const hallazgos = document.getElementById('f_hallazgos').value.trim();
   const entregadoA = document.getElementById('f_entregadoA').value || '—';
   const cargo = document.getElementById('f_cargo').value || '—';
@@ -5512,8 +5465,7 @@ async function generarInformePDF(){
     `Supervisor: ${supervisor}`,
     `Hora inicio: ${horainicio}   Hora término: ${horatermino}`,
     `N° Interno/TAG: ${interno}`,
-    `Ubicación: ${ubicacion}`,
-    horometro ? `Horómetro/OT: ${horometro}` : ''
+    `Ubicación: ${ubicacion}`
   ].filter(Boolean).forEach(linea => { doc.text(linea, marginX, y); y += 5; });
   doc.setFont('helvetica','bold');
   doc.text(`ESTADO: ${estado.label}`, marginX, y); y += 7;
@@ -5696,7 +5648,6 @@ function buildPrintArea(){
   const serie = document.getElementById('f_serie').value || '—';
   const interno = document.getElementById('f_interno').value || '—';
   const ubicacion = document.getElementById('f_ubicacion').value || '—';
-  const horometro = document.getElementById('f_horometro').value || '—';
   const hallazgos = document.getElementById('f_hallazgos').value.trim();
   const entregadoA = document.getElementById('f_entregadoA').value || '—';
   const cargo = document.getElementById('f_cargo').value || '—';
@@ -5844,7 +5795,7 @@ async function exportCSV(){
   try{
     const rows = await storage.allEntries('registro:');
     if(!rows.length){ toast('No hay registros para exportar'); return; }
-    const headers = ['Folio','Fecha','Servicio','Equipo','Marca','Modelo','Capacidad','Horómetro/OT','Técnico','Supervisor','Estado','Bueno','Regular','Malo','N/A'];
+    const headers = ['Folio','Fecha','Servicio','Equipo','Marca','Modelo','Capacidad','Técnico','Supervisor','Estado','Bueno','Regular','Malo','N/A'];
     const lines = [headers.join(';')];
     rows.forEach(r => {
       const rec = r.value;
@@ -5854,7 +5805,7 @@ async function exportCSV(){
       const servicioLabel = rec.servicio === 'inspeccion' ? 'Inspección' : 'Mantención';
       lines.push([
         rec.ninforme, rec.fecha, servicioLabel, rec.interno || rec.modelo, rec.marca, rec.modelo, rec.serie,
-        rec.horometro, rec.tecnico, rec.supervisor, estado.label, counts.bueno, counts.regular, counts.malo, naCount
+        rec.tecnico, rec.supervisor, estado.label, counts.bueno, counts.regular, counts.malo, naCount
       ].map(csvEscape).join(';'));
     });
     const csv = '\uFEFF' + lines.join('\n'); // BOM para que Excel abra bien las tildes
@@ -5898,7 +5849,7 @@ document.getElementById('fileImport').addEventListener('change', (e) => { if(e.t
 /* ============================================================
    INIT
    ============================================================ */
-const APP_VERSION = 'v7'; // subir junto con la versión del service-worker en cada entrega
+const APP_VERSION = 'v8'; // subir junto con la versión del service-worker en cada entrega
 
 async function init(){
   document.getElementById('appVersion').textContent = APP_VERSION;
