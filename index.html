@@ -2865,7 +2865,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           <div class="field"><label>N° de Informe</label><input type="text" id="f_ninforme"></div>
           <div class="field"><label>Fecha</label><input type="date" id="f_fecha"></div>
         </div>
-        <div class="field"><label>N° de OT</label><input type="text" id="f_ot"></div>
+        <div class="field"><label>N° de OT</label><input type="text" id="f_ot" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
         <div class="field"><label>Tipo de Servicio</label><input type="text" id="f_tiposervicio"></div>
         <div class="row2">
           <div class="field">
@@ -5897,7 +5897,7 @@ document.getElementById('fileImport').addEventListener('change', (e) => { if(e.t
 /* ============================================================
    INIT
    ============================================================ */
-const APP_VERSION = 'v10'; // subir junto con la versión del service-worker en cada entrega
+const APP_VERSION = 'v11'; // subir junto con la versión del service-worker en cada entrega
 
 async function init(){
   document.getElementById('appVersion').textContent = APP_VERSION;
