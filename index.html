@@ -20,6 +20,7 @@
     --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     --ink:#161A20; --graphite:#20242C; --graphite-2:#2A2F39;
     --steel:#3D5A80; --steel-2:#4E6D96; --safety:#FFC72C; --safety-ink:#3A2C00;
+    --corp-topbar:#00778B; --corp-ant:#64CCC9; --corp-ant-ink:#04353A;
     --paper:#F4F5F7; --card:#FFFFFF; --line:#E1E4E9; --muted:#6B7280;
     --bueno:#1E8E5A; --bueno-bg:#E3F6EC;
     --regular:#B8860B; --regular-bg:#FDF3D9;
@@ -35,8 +36,10 @@
   .mono{font-family:var(--font-mono);}
   button{font-family:inherit;}
 
-  .topbar{background:linear-gradient(180deg,var(--graphite),var(--ink));color:#fff;padding:calc(14px + env(safe-area-inset-top)) 14px 0;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15);}
+  .topbar{background:var(--corp-topbar);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 14px 0;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15);}
   .topbar .brand{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;}
+  .topbar .brand-text{flex:1;min-width:0;}
+  .topbar .badge-ant{background:var(--corp-ant);color:var(--corp-ant-ink);}
   .brand .badge{width:32px;height:32px;border-radius:8px;background:var(--safety);display:flex;align-items:center;justify-content:center;color:var(--safety-ink);font-family:var(--font-display);font-weight:700;font-size:15px;flex:none;}
   .brand h1{font-size:17px;font-weight:700;line-height:1.15;}
   .brand small{display:block;font-family:var(--font-mono);font-size:10px;color:#B7BECB;letter-spacing:.02em;margin-top:1px;}
@@ -2788,11 +2791,12 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
 
 <div class="topbar">
   <div class="brand" id="goHome">
-    <div class="badge">CA</div>
-    <div>
+    <div class="badge">PG</div>
+    <div class="brand-text">
       <h1>Mantenimiento Puentes Grúa y Polipastos ANT</h1>
-      <small id="topSub">Antucoya · Inspección y Mantención · <span id="appVersion"></span></small>
+      <small id="topSub">Antucoya · Soporte a la Operación · <span id="appVersion"></span></small>
     </div>
+    <div class="badge badge-ant">ANT</div>
   </div>
   <div class="tabs">
     <div class="tab active" data-tab="home">Inicio</div>
@@ -3567,7 +3571,7 @@ async function saveTecnicos(){ await storage.set('tecnicos_master', tecnicos); }
 async function saveSupervisores(){ await storage.set('supervisores_master', supervisores); }
 
 /* ============================================================
-   FOLIO AUTOMÁTICO — [AREA]-COMP-[AÑO]-[CORRELATIVO]
+   FOLIO AUTOMÁTICO — [AREA]-PG-[AÑO]-[CORRELATIVO]
    ============================================================ */
 async function previewFolio(area){
   if(!area) return '';
@@ -3575,7 +3579,7 @@ async function previewFolio(area){
   const year = new Date().getFullYear();
   const key = `folio_counter:${code}:${year}`;
   const current = (await storage.get(key)) || 0;
-  return `${code}-COMP-${year}-${String(current+1).padStart(4,'0')}`;
+  return `${code}-PG-${year}-${String(current+1).padStart(4,'0')}`;
 }
 async function commitFolio(area){
   if(!area) return '';
@@ -3585,7 +3589,7 @@ async function commitFolio(area){
   const current = (await storage.get(key)) || 0;
   const next = current + 1;
   await storage.set(key, next);
-  return `${code}-COMP-${year}-${String(next).padStart(4,'0')}`;
+  return `${code}-PG-${year}-${String(next).padStart(4,'0')}`;
 }
 
 /* ============================================================
@@ -5875,7 +5879,7 @@ document.getElementById('fileImport').addEventListener('change', (e) => { if(e.t
 /* ============================================================
    INIT
    ============================================================ */
-const APP_VERSION = 'v4'; // subir junto con la versión del service-worker en cada entrega
+const APP_VERSION = 'v5'; // subir junto con la versión del service-worker en cada entrega
 
 async function init(){
   document.getElementById('appVersion').textContent = APP_VERSION;
