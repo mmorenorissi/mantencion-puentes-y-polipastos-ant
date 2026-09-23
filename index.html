@@ -2994,6 +2994,11 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
         <div class="filter-chip" data-f="inspeccion">Inspección</div>
         <div class="filter-chip" data-f="mtto">Mantención</div>
       </div>
+      <div class="card-pad" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;padding-top:10px;padding-bottom:0;">
+        <div class="field" style="flex:1;min-width:120px;margin-bottom:0;"><label>Desde</label><input type="date" id="histDateFrom"></div>
+        <div class="field" style="flex:1;min-width:120px;margin-bottom:0;"><label>Hasta</label><input type="date" id="histDateTo"></div>
+        <button class="btn btn-secondary" id="btnHist7d" style="flex:none;">Últimos 7 días</button>
+      </div>
       <div id="histList" style="margin-top:8px;"></div>
     </div>
     <div class="modal-bg" id="remoteModal">
@@ -3022,25 +3027,6 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
         </p>
       </div>
     </div>
-    <div class="card">
-      <div class="card-head"><h2>Respaldo y exportación</h2></div>
-      <div class="card-pad" style="display:flex;gap:10px;">
-        <button class="btn btn-secondary" id="btnExport" style="flex:1;">⬇ Respaldo JSON</button>
-        <button class="btn btn-secondary" id="btnExportCSV" style="flex:1;">📊 Exportar CSV</button>
-      </div>
-      <div class="card-pad" style="padding-top:0;">
-        <label class="btn btn-secondary" style="width:100%;text-align:center;display:block;">
-          ⬆ Importar respaldo
-          <input type="file" accept="application/json" id="fileImport" style="display:none;">
-        </label>
-      </div>
-      <div class="card-pad" style="padding-top:0;">
-        <p style="font-size:11.5px;color:var(--muted);line-height:1.4;margin:0;">
-          Los registros se guardan siempre en este dispositivo/navegador, aunque tengas la sincronización activada.
-          Exporta un respaldo cada cierto tiempo y guárdalo en Archivos, correo o WhatsApp.
-        </p>
-      </div>
-    </div>
   </section>
 
   <!-- Overlay del escáner QR: fuera de las secciones .view a propósito.
@@ -3066,7 +3052,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
       <div class="card-pad" style="padding-top:0;">
         <p style="font-size:11px;color:var(--muted);line-height:1.4;margin:0;background:var(--paper);border-radius:8px;padding:9px 11px;">
           💾 Estos cambios se guardan solo en este teléfono. Si haces ediciones importantes (nombres, equipos nuevos, técnicos),
-          ve a <b>Historial → Respaldo JSON</b> y guarda una copia — así no se pierde nada aunque el teléfono borre datos algún día.
+          usa el <b>Respaldo JSON</b> más abajo y guarda una copia — así no se pierde nada aunque el teléfono borre datos algún día.
         </p>
       </div>
     </div>
@@ -3121,6 +3107,29 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
       <div class="card-pad" style="display:flex;gap:8px;">
         <input type="text" id="nuevoSupervisor" placeholder="Nombre del supervisor" style="flex:1;padding:10px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:15px;">
         <button style="flex:none;padding:10px 16px;border-radius:8px;border:none;background:var(--steel);color:#fff;font-weight:700;" id="addSupervisorBtn">Agregar</button>
+      </div>
+    </div>
+
+    <!-- Respaldo y Restauración — movido desde Historial (§78): puede sobrescribir datos
+         existentes, así que va en la zona administrativa protegida por verificarClaveEquipos(),
+         que ya se exige para entrar completo a esta pestaña. No es un PIN nuevo. -->
+    <div class="card">
+      <div class="card-head"><h2>Respaldo y exportación</h2></div>
+      <div class="card-pad" style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" id="btnExport" style="flex:1;">⬇ Respaldo JSON</button>
+        <button class="btn btn-secondary" id="btnExportCSV" style="flex:1;">📊 Exportar CSV</button>
+      </div>
+      <div class="card-pad" style="padding-top:0;">
+        <label class="btn btn-secondary" style="width:100%;text-align:center;display:block;">
+          ⬆ Importar respaldo
+          <input type="file" accept="application/json" id="fileImport" style="display:none;">
+        </label>
+      </div>
+      <div class="card-pad" style="padding-top:0;">
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.4;margin:0;">
+          Los registros se guardan siempre en este dispositivo/navegador, aunque tengas la sincronización activada.
+          Exporta un respaldo cada cierto tiempo y guárdalo en Archivos, correo o WhatsApp.
+        </p>
       </div>
     </div>
   </section>
@@ -5032,6 +5041,24 @@ document.getElementById('histSearch').addEventListener('input', (e) => {
   histSearchTerm = e.target.value.trim().toLowerCase();
   loadHistory();
 });
+// Filtro de fecha (§77) — Desde/Hasta se combinan con los filtros de tipo/texto que ya
+// existen, no los reemplazan. Vacíos = sin restricción por ese lado.
+let histDateFrom = '';
+let histDateTo = '';
+document.getElementById('histDateFrom').addEventListener('change', (e) => {
+  histDateFrom = e.target.value; loadHistory();
+});
+document.getElementById('histDateTo').addEventListener('change', (e) => {
+  histDateTo = e.target.value; loadHistory();
+});
+document.getElementById('btnHist7d').addEventListener('click', () => {
+  const desde = new Date(); desde.setDate(desde.getDate() - 7);
+  histDateTo = todayISO();
+  histDateFrom = desde.toISOString().slice(0,10);
+  document.getElementById('histDateFrom').value = histDateFrom;
+  document.getElementById('histDateTo').value = histDateTo;
+  loadHistory();
+});
 
 async function loadHistory(){
   const list = document.getElementById('histList');
@@ -5074,18 +5101,38 @@ async function loadHistory(){
     return true;
   });
 
-  if(!idx.length && !remotosFiltrados.length){ list.innerHTML = `<div class="empty-state">Sin registros que coincidan.</div>`; return; }
+  // Filtro de fecha (§77) — se aplica DESPUÉS de los filtros de tipo/texto de arriba,
+  // sobre el campo "fecha" (la del servicio, no savedAt/updatedAt), igual en ambos orígenes.
+  const dentroDeRango = (fechaStr) => {
+    if(!fechaStr) return !histDateFrom && !histDateTo; // sin fecha: solo entra si no hay filtro activo
+    if(histDateFrom && fechaStr < histDateFrom) return false;
+    if(histDateTo && fechaStr > histDateTo) return false;
+    return true;
+  };
+  const idxEnRango = idx.filter(x => dentroDeRango(x.fecha));
+  const remotosEnRango = remotosFiltrados.filter(r => dentroDeRango(r.fecha));
 
-  const localesHTML = idx.map(item => `<div style="display:flex;align-items:center;">
-      <div style="flex:1;">${historyRowHTML(item)}</div>
-      <button class="hist-del" data-del="${item.id}" style="margin-right:10px;">🗑</button>
-    </div>`).join('');
-  const remotosHTML = await Promise.all(remotosFiltrados.map(async r => `<div style="display:flex;align-items:center;">
-      <div style="flex:1;">${await remoteRowHTML(r)}</div>
-      <button class="hist-del" data-delremote="${esc(r.id)}" style="margin-right:10px;">🗑</button>
-    </div>`));
+  if(!idxEnRango.length && !remotosEnRango.length){ list.innerHTML = `<div class="empty-state">Sin registros que coincidan.</div>`; return; }
 
-  list.innerHTML = localesHTML + remotosHTML.join('');
+  // Fusión en UNA sola lista cronológica (§1.2 del paquete) — antes se mostraban dos
+  // bloques separados (locales, luego remotos) sin relación entre sí. Se ordena por la
+  // fecha del servicio, y como desempate entre registros del mismo día se usa el momento
+  // de guardado (savedAt local / updatedAt remoto), más reciente primero.
+  const filas = [
+    ...idxEnRango.map(item => ({ origin: 'local', fecha: item.fecha || '', ord: item.savedAt || '', data: item })),
+    ...remotosEnRango.map(r => ({ origin: 'remote', fecha: r.fecha || '', ord: r.updatedAt || '', data: r }))
+  ].sort((a, b) => (b.fecha + b.ord).localeCompare(a.fecha + a.ord));
+
+  const filasHTML = await Promise.all(filas.map(async f => {
+    const inner = f.origin === 'local' ? historyRowHTML(f.data) : await remoteRowHTML(f.data);
+    const delAttr = f.origin === 'local' ? `data-del="${f.data.id}"` : `data-delremote="${esc(f.data.id)}"`;
+    return `<div style="display:flex;align-items:center;">
+      <div style="flex:1;">${inner}</div>
+      <button class="hist-del" ${delAttr} style="margin-right:10px;">🗑</button>
+    </div>`;
+  }));
+
+  list.innerHTML = filasHTML.join('');
   list.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', () => loadRecordIntoForm(el.dataset.open)));
   list.querySelectorAll('[data-remote]').forEach(el => el.addEventListener('click', () => openRemoteDetail(el.dataset.remote)));
   list.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', async (e) => {
@@ -5850,7 +5897,7 @@ document.getElementById('fileImport').addEventListener('change', (e) => { if(e.t
 /* ============================================================
    INIT
    ============================================================ */
-const APP_VERSION = 'v9'; // subir junto con la versión del service-worker en cada entrega
+const APP_VERSION = 'v10'; // subir junto con la versión del service-worker en cada entrega
 
 async function init(){
   document.getElementById('appVersion').textContent = APP_VERSION;
