@@ -3411,11 +3411,17 @@ function buildMttoPauta(){
   return itemsPorTipo(tipo).map(sec => ({ key: sec.key, title: sec.title, items: sec.items }));
 }
 
-// Pauta de INSPECCIÓN — misma tabla que Mantención (a diferencia de Compresores,
-// aquí no separamos Inspección/Mantención por ahora: se define en la próxima iteración
-// una vez que LOOP confirme si aplica una pauta reducida para inspección diaria/semanal.
+// Pauta de INSPECCIÓN — DERIVADA automáticamente de la pauta de Mantención (ANT-111,
+// patrón §70.5 del estándar): un ítem-resumen por sección ("Estado general — <sección>"),
+// nunca se duplica contenido técnico a mano en un lugar aparte. Si cambian los ítems de
+// Mantención, la pauta de Inspección se actualiza sola y no queda desalineada.
+// ES LA VERSIÓN FUNCIONAL CORRECTA, no la definitiva — Mario la afina con los técnicos.
 function buildInspeccionPauta(){
-  return buildMttoPauta();
+  return buildMttoPauta().map(sec => ({
+    key: sec.key,
+    title: sec.title,
+    items: [`Estado general — ${sec.title}`]
+  }));
 }
 
 
@@ -4601,6 +4607,12 @@ function repuestosRealizadosSinFoto(){
     s && s.status === 'realizado' && (!photoState[aid] || !photoState[aid].length)
   );
 }
+// ANT-109: la criticidad de un ítem MALO se mostraba en la UI pero no bloqueaba el
+// guardado si quedaba sin seleccionar. Este chequeo replica el patrón que ya usa
+// Compresores para exigirla de verdad antes de guardar.
+function itemsSinCriticidad(){
+  return Object.entries(itemState).filter(([key, s]) => s.status === 'malo' && !s.criticidad);
+}
 async function saveRecord(){
   const pendientes = Object.values(itemState).filter(s => !s.status).length;
   if(pendientes){
@@ -4610,6 +4622,12 @@ async function saveRecord(){
   const sinEvidencia = itemsSinEvidencia();
   if(sinEvidencia.length){
     toast(`✕ Hay ${sinEvidencia.length} ítem(s) MALO sin foto ni justificación. Completa uno de los dos para guardar.`);
+    renderSections();
+    return false;
+  }
+  const sinCriticidad = itemsSinCriticidad();
+  if(sinCriticidad.length){
+    toast(`✕ Hay ${sinCriticidad.length} ítem(s) MALO sin criticidad seleccionada. Indica Crítica/Alta/Media/Baja para poder guardar.`);
     renderSections();
     return false;
   }
@@ -4624,6 +4642,7 @@ async function saveRecord(){
   // validacion obligatoria de horometro que traia la plantilla de Compresores.
   const equipoId = document.getElementById('f_equipo').value;
   if(!equipoId){ toast('✕ Selecciona un equipo antes de guardar.'); return false; }
+  if(!document.getElementById('f_ot').value.trim()){ toast('✕ Falta indicar el N° de OT antes de guardar.'); return false; }
   if(!document.getElementById('f_completadoPor').value){ toast('✕ Falta indicar quién completa este registro (arriba de todo).'); return false; }
 
   const rec = buildRecord();
@@ -5879,7 +5898,7 @@ document.getElementById('fileImport').addEventListener('change', (e) => { if(e.t
 /* ============================================================
    INIT
    ============================================================ */
-const APP_VERSION = 'v6'; // subir junto con la versión del service-worker en cada entrega
+const APP_VERSION = 'v7'; // subir junto con la versión del service-worker en cada entrega
 
 async function init(){
   document.getElementById('appVersion').textContent = APP_VERSION;
