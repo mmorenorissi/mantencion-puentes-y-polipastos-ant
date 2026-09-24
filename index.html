@@ -20,7 +20,6 @@
     --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     --ink:#161A20; --graphite:#20242C; --graphite-2:#2A2F39;
     --steel:#3D5A80; --steel-2:#4E6D96; --safety:#FFC72C; --safety-ink:#3A2C00;
-    --corp-topbar:#00778B; --corp-ant:#64CCC9; --corp-ant-ink:#04353A;
     --paper:#F4F5F7; --card:#FFFFFF; --line:#E1E4E9; --muted:#6B7280;
     --bueno:#1E8E5A; --bueno-bg:#E3F6EC;
     --regular:#B8860B; --regular-bg:#FDF3D9;
@@ -36,10 +35,8 @@
   .mono{font-family:var(--font-mono);}
   button{font-family:inherit;}
 
-  .topbar{background:var(--corp-topbar);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 14px 0;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15);}
+  .topbar{background:linear-gradient(180deg,var(--graphite),var(--ink));color:#fff;padding:calc(14px + env(safe-area-inset-top)) 14px 0;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15);}
   .topbar .brand{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;}
-  .topbar .brand-text{flex:1;min-width:0;text-align:center;}
-  .topbar .badge-ant{background:var(--corp-ant);color:var(--corp-ant-ink);}
   .brand .badge{width:32px;height:32px;border-radius:8px;background:var(--safety);display:flex;align-items:center;justify-content:center;color:var(--safety-ink);font-family:var(--font-display);font-weight:700;font-size:15px;flex:none;}
   .brand h1{font-size:17px;font-weight:700;line-height:1.15;}
   .brand small{display:block;font-family:var(--font-mono);font-size:10px;color:#B7BECB;letter-spacing:.02em;margin-top:1px;}
@@ -71,7 +68,13 @@
   .hero-title{text-align:center;padding:26px 10px 18px;}
   .hero-title h1{font-size:22px;font-weight:700;color:var(--ink);letter-spacing:.01em;}
   .hero-title p{font-size:12.5px;color:var(--muted);margin-top:6px;font-family:var(--font-mono);}
-  .choice-stack{display:flex;flex-direction:column;margin-bottom:12px;}
+  .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  @media (max-width:480px){ .choice-grid{grid-template-columns:1fr;} }
+  .choice-card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;box-shadow:var(--shadow);}
+  .choice-card.selected{border-color:var(--steel);background:#F5F8FB;}
+  .choice-card .icon{font-size:28px;margin-bottom:6px;}
+  .choice-card h3{font-size:16px;font-weight:700;color:var(--ink);}
+  .choice-card p{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.35;}
   .subchoice{display:flex;gap:8px;margin-top:10px;}
   .subchoice button{flex:1;padding:10px 6px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-size:12.5px;font-weight:700;font-family:var(--font-display);color:var(--muted);cursor:pointer;}
   .subchoice button.sel{background:var(--steel);border-color:var(--steel);color:#fff;}
@@ -2791,12 +2794,11 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
 
 <div class="topbar">
   <div class="brand" id="goHome">
-    <div class="badge">PG</div>
-    <div class="brand-text">
+    <div class="badge">CA</div>
+    <div>
       <h1>Mantenimiento Puentes Grúa y Polipastos ANT</h1>
-      <small id="topSub">Antucoya · Soporte a la Operación · <span id="appVersion"></span></small>
+      <small id="topSub">Antucoya · Inspección y Mantención · <span id="appVersion"></span></small>
     </div>
-    <div class="badge badge-ant">ANT</div>
   </div>
   <div class="tabs">
     <div class="tab active" data-tab="home">Inicio</div>
@@ -2816,9 +2818,17 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
 
     <div id="draftBanner" style="display:none;margin-bottom:12px;background:var(--regular-bg);border:1.5px solid var(--regular);border-radius:10px;padding:12px 14px;"></div>
 
-    <div class="choice-stack">
-      <button type="button" class="btn-full" style="background:var(--steel);color:#fff;padding:16px;font-size:15.5px;margin-bottom:10px;" id="choiceInspeccion" data-servicio="inspeccion">🔍 Iniciar Inspección</button>
-      <button type="button" class="btn-full" style="background:var(--steel);color:#fff;padding:16px;font-size:15.5px;margin-bottom:14px;" id="choiceMtto" data-servicio="mtto">🛠️ Iniciar Mantención</button>
+    <div class="choice-grid">
+      <div class="choice-card" id="choiceInspeccion" data-servicio="inspeccion">
+        <div class="icon">🔍</div>
+        <h3>Inspección</h3>
+        <p>Pauta según el tipo de equipo (Puente Grúa, Polipasto, Tecle)</p>
+      </div>
+      <div class="choice-card" id="choiceMtto" data-servicio="mtto">
+        <div class="icon">🛠️</div>
+        <h3>Mantención</h3>
+        <p>Misma pauta que Inspección, según tipo de equipo</p>
+      </div>
     </div>
 
     <div class="card">
@@ -2852,7 +2862,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           <select id="f_equipo"></select>
         </div>
         <div class="field" id="f_intervaloWrap" style="display:none;">
-          <label>Plan de Mantención</label>
+          <label>Intervalo de mantención</label>
           <select id="f_intervalo"></select>
         </div>
       </div>
@@ -2865,7 +2875,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           <div class="field"><label>N° de Informe</label><input type="text" id="f_ninforme"></div>
           <div class="field"><label>Fecha</label><input type="date" id="f_fecha"></div>
         </div>
-        <div class="field"><label>N° de OT</label><input type="text" id="f_ot" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+        <div class="field"><label>N° de OT</label><input type="text" id="f_ot"></div>
         <div class="field"><label>Tipo de Servicio</label><input type="text" id="f_tiposervicio"></div>
         <div class="row2">
           <div class="field">
@@ -2893,7 +2903,15 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           <div class="field"><label>Capacidad</label><input type="text" id="f_serie"></div>
           <div class="field"><label>N° Interno / TAG</label><input type="text" id="f_interno"></div>
         </div>
-        <div class="field"><label>Ubicación en Faena</label><input type="text" id="f_ubicacion"></div>
+        <div class="row2">
+          <div class="field"><label>Ubicación en Faena</label><input type="text" id="f_ubicacion"></div>
+          <div class="field"><label>Horómetro / N° OT SAP (opcional)</label><input type="text" inputmode="decimal" id="f_horometro"></div>
+        </div>
+        <div id="horometroWarning" style="display:none;background:var(--malo-bg);color:var(--malo);border-radius:8px;padding:9px 11px;font-size:12.5px;font-weight:600;margin-top:-4px;margin-bottom:11px;"></div>
+        <div class="field" id="horometroJustWrap" style="display:none;">
+          <label style="color:var(--malo);">Justificación (horómetro menor al último registrado)</label>
+          <textarea id="f_horometroJust" rows="2" style="width:100%;border:1.5px solid var(--malo-bg);border-radius:8px;padding:9px 11px;font-family:var(--font-body);font-size:14px;"></textarea>
+        </div>
         <div id="historialEquipoMini" style="display:none;"></div>
       </div>
     </div>
@@ -2994,11 +3012,6 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
         <div class="filter-chip" data-f="inspeccion">Inspección</div>
         <div class="filter-chip" data-f="mtto">Mantención</div>
       </div>
-      <div class="card-pad" style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;padding-top:10px;padding-bottom:0;">
-        <div class="field" style="flex:1;min-width:120px;margin-bottom:0;"><label>Desde</label><input type="date" id="histDateFrom"></div>
-        <div class="field" style="flex:1;min-width:120px;margin-bottom:0;"><label>Hasta</label><input type="date" id="histDateTo"></div>
-        <button class="btn btn-secondary" id="btnHist7d" style="flex:none;">Últimos 7 días</button>
-      </div>
       <div id="histList" style="margin-top:8px;"></div>
     </div>
     <div class="modal-bg" id="remoteModal">
@@ -3021,9 +3034,27 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
           <button class="btn btn-secondary" id="btnSyncNow" style="flex:1;">🔄 Sincronizar pendientes</button>
         </div>
         <p style="font-size:11px;color:var(--muted);line-height:1.4;margin:10px 0 0;">
-          Se sincronizan los datos de cada checklist (equipo, estados, observaciones) — las fotos y firmas no
-          van en la planilla por el límite de tamaño de Sheets, pero sí quedan incluidas en el PDF del informe,
-          que se sube a Drive y se puede compartir por correo o WhatsApp.
+          Por ahora se sincronizan los datos de cada checklist (equipo, estados, observaciones) — las fotos y firmas
+          quedan solo en el dispositivo que las tomó, eso lo sumamos en una siguiente etapa.
+        </p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Respaldo y exportación</h2></div>
+      <div class="card-pad" style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" id="btnExport" style="flex:1;">⬇ Respaldo JSON</button>
+        <button class="btn btn-secondary" id="btnExportCSV" style="flex:1;">📊 Exportar CSV</button>
+      </div>
+      <div class="card-pad" style="padding-top:0;">
+        <label class="btn btn-secondary" style="width:100%;text-align:center;display:block;">
+          ⬆ Importar respaldo
+          <input type="file" accept="application/json" id="fileImport" style="display:none;">
+        </label>
+      </div>
+      <div class="card-pad" style="padding-top:0;">
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.4;margin:0;">
+          Los registros se guardan siempre en este dispositivo/navegador, aunque tengas la sincronización activada.
+          Exporta un respaldo cada cierto tiempo y guárdalo en Archivos, correo o WhatsApp.
         </p>
       </div>
     </div>
@@ -3052,7 +3083,7 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
       <div class="card-pad" style="padding-top:0;">
         <p style="font-size:11px;color:var(--muted);line-height:1.4;margin:0;background:var(--paper);border-radius:8px;padding:9px 11px;">
           💾 Estos cambios se guardan solo en este teléfono. Si haces ediciones importantes (nombres, equipos nuevos, técnicos),
-          usa el <b>Respaldo JSON</b> más abajo y guarda una copia — así no se pierde nada aunque el teléfono borre datos algún día.
+          ve a <b>Historial → Respaldo JSON</b> y guarda una copia — así no se pierde nada aunque el teléfono borre datos algún día.
         </p>
       </div>
     </div>
@@ -3107,29 +3138,6 @@ var jsQRLib=(()=>{var C0=(z,w)=>()=>{try{return w||z((w={exports:{}}).exports,w)
       <div class="card-pad" style="display:flex;gap:8px;">
         <input type="text" id="nuevoSupervisor" placeholder="Nombre del supervisor" style="flex:1;padding:10px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:15px;">
         <button style="flex:none;padding:10px 16px;border-radius:8px;border:none;background:var(--steel);color:#fff;font-weight:700;" id="addSupervisorBtn">Agregar</button>
-      </div>
-    </div>
-
-    <!-- Respaldo y Restauración — movido desde Historial (§78): puede sobrescribir datos
-         existentes, así que va en la zona administrativa protegida por verificarClaveEquipos(),
-         que ya se exige para entrar completo a esta pestaña. No es un PIN nuevo. -->
-    <div class="card">
-      <div class="card-head"><h2>Respaldo y exportación</h2></div>
-      <div class="card-pad" style="display:flex;gap:10px;">
-        <button class="btn btn-secondary" id="btnExport" style="flex:1;">⬇ Respaldo JSON</button>
-        <button class="btn btn-secondary" id="btnExportCSV" style="flex:1;">📊 Exportar CSV</button>
-      </div>
-      <div class="card-pad" style="padding-top:0;">
-        <label class="btn btn-secondary" style="width:100%;text-align:center;display:block;">
-          ⬆ Importar respaldo
-          <input type="file" accept="application/json" id="fileImport" style="display:none;">
-        </label>
-      </div>
-      <div class="card-pad" style="padding-top:0;">
-        <p style="font-size:11.5px;color:var(--muted);line-height:1.4;margin:0;">
-          Los registros se guardan siempre en este dispositivo/navegador, aunque tengas la sincronización activada.
-          Exporta un respaldo cada cierto tiempo y guárdalo en Archivos, correo o WhatsApp.
-        </p>
       </div>
     </div>
   </section>
@@ -3322,53 +3330,101 @@ function parseIntervaloHoras(str){
 }
 
 // ============================================================
-// PAUTA_POR_TIPO — un set de tareas por TIPO de equipo (categoria).
-// Fuente: Pauta_PG-TRUCKSHOP.pdf / Pauta_SPO-CH-SEC-TER.pdf (OT SAP reales,
-// pauta estandar 'Pauta PM Puentes Gruas 02 Ganchos') para Puente Grua/Semi
-// Portal/Portal, y la Matriz de Criticidad (IM_CV01_.xlsx) para Polipasto/
-// Monorriel. ES UN BORRADOR: Mario revisara/corregira esta pauta con el
-// contratista (LOOP) via un Excel de revision y la reemplazara en bloque.
+// PAUTA_POR_TIPO v2 -- reemplaza el borrador anterior (OCR de una sola OT).
+// Fuente: 3 reportes REALES de LOOP (Reporte de Actividad, OT ejecutadas),
+// 2 de ellos confirmados ademas con un 2do formato identico (feeder CHS/CHT).
+//   - PAUTA_POLIPASTO (53 items): Polipasto/Monorriel, 1 gancho, sin Puente.
+//     Confirmado con POLI-FEEDER-CH-TER y POLI-FEEDER-CH-SEC (identicas).
+//   - PAUTA_GRUA_1GANCHO (72 items): Puente Grua/Portal, 1 gancho, con Puente.
+//     Confirmado con GPO-CH-PRIM (Grua Portal GM6000, Chancador Primario).
+//   - PAUTA_GRUA_2GANCHOS (91 items): Puente Grua/Semi Portal, 2 ganchos
+//     (Principal + Auxiliar), con Puente. Confirmado con SPO-CH-SEC-TER
+//     (Semi Portal GM7000-5000, capacidad 40/5 T).
+// La asignacion equipo -> pauta la confirmo Mario directamente (24-sep-2026),
+// no se infiere de la capacidad -- ver PAUTA_ASIGNADA_POR_EQUIPO mas abajo.
 // ============================================================
-const PAUTA_GRUA = [
-  { key:'alarma_y_senalizacion', title:'ALARMA Y SENALIZACION', items:['Revisar estado y funcionamiento de alarma sonora en el sistema.', 'Revisar estado y funcionamiento de baliza en el sistema.', 'Revisar alimentación eléctrica, conexiones, canalización por: sujeción, uniones, cables de alimentación, desgaste y buen funcionamiento.', 'Chequear que la capacidad del Grúa este indicada en la viga y sea legible desde el piso.', 'Chequear estado funcional del display de carga.', 'Realizar limpieza general.'] },
-  { key:'limitador_traslacion_puente', title:'LIMITADOR TRASLACIÓN PUENTE', items:['Chequear normal funcionamiento del limitador de traslación. El chequeo debe ser sin carga y en baja velocidad.', 'Revisar actuadores y limitador traslación puente por: desgaste, instalación, trizadura, sujeción, etc.', 'Chequear resistividad de contactos eléctricos.', 'Revisar estado de canalizaciones por fijación y estado de tapa de bandeja.', 'Realizar limpieza general del limitador.'] },
-  { key:'limitador_traslacion_carro', title:'LIMITADOR TRASLACIÓN CARRO', items:['Chequear normal funcionamiento del limitador de traslación. El chequeo debe ser sin carga y en baja velocidad.', 'Revisar actuadores y limitador traslación puente por: desgaste, instalación, trizadura, sujeción, etc.', 'Chequear resistividad de contactos eléctricos.', 'Revisar estado de canalizaciones por fijación y estado de tapa de bandeja.', 'Realizar limpieza general del limitador.'] },
-  { key:'limitador_izaje_gancho_principal', title:'LIMITADOR IZAJE GANCHO PRINCIPAL', items:['Chequear estado y normal funcionamiento del limitador de carrera. El chequeo debe ser sin carga y en baja velocidad.', 'Revisar estado de cables y conexiones por sujeción y contactos.', 'Chequear resistividad de contactos eléctricos.', 'Chequear estado y normal funcionamiento de segundo límite de carrera de seguridad. El chequeo debe ser sin carga y en baja velocidad.', 'Verificar que al menos queden dos vueltas de seguridad cuando el gancho alcanza su posición más baja.', 'Realizar limpieza general.'] },
-  { key:'limitador_izaje_gancho_auxiliar', title:'LIMITADOR IZAJE GANCHO AUXILIAR', items:['Chequear estado y normal funcionamiento del limitador de carrera. El chequeo debe ser sin carga y en baja velocidad.', 'Revisar estado de cables y conexiones por sujeción y contactos.', 'Chequear resistividad de contactos eléctricos.', 'Chequear estado y normal funcionamiento de segundo límite de carrera de seguridad. El chequeo debe ser sin carga y en baja velocidad.', 'Verificar que al menos queden dos vueltas de seguridad cuando el gancho alcanza su posición más baja.', 'Realizar limpieza general.'] },
-  { key:'dispositivo_limitador_de_cargas', title:'DISPOSITIVO LIMITADOR DE CARGAS', items:['Revisar funcionamiento eléctrico de limitador de carga y chequear por: deterioro, desgaste y resistividad de contactos.', 'Revisar visualmente celda de carga por: daños, deformaciones.', 'Chequear cables de alimentación por: picaduras, deterioro, desgaste, apriete de conexiones, buen funcionamiento.', 'Revisar estado de canalizaciones por fijación y estado de cobertores.', 'Realizar limpieza general a dispositivo.'] },
-  { key:'sistema_de_mando_tipo_botonera', title:'SISTEMA DE MANDO TIPO BOTONERA', items:['Chequear por: buen funcionamiento, estado de cuerpo y sellos.', 'Revisar estado y funcionamiento de pulsadores. Chequear que todos los movimientos estén de acuerdo a las marcas de los pulsadores y correcta distribución.', 'Chequear Parada de emergencia por buen funcionamiento y signos de daño.', 'Revisar estado de cable de control por: deterioro, desgaste, signos de daño y, conexión por sujeciones sueltas, grietas, etc.', 'Revisar estado de cable mensajero por: deterioro, desgaste, signos de daño y funcionamiento. Presencia de prensa Crosby.', 'Desarmar botonera, verificar apriete de conexiones y limpieza de block de contactos.', 'Revisar estado de soportes, chequear por: falta o soltura de pernos, tuercas, tornillos, o remaches.'] },
-  { key:'sistema_de_mando_tipo_radio_control', title:'SISTEMA DE MANDO TIPO RADIO CONTROL', items:['Revisar baterías y cargador por: buen funcionamiento, deterioro, desgaste, signos de daño.', 'Chequear correcto funcionamiento operacional de receptor de radio control.', 'Revisar Joystick y sellos por: movimientos, contaminación y deterioro.', 'Revisar estado y funcionamiento a pulsadores. Chequear que todos los movimientos estén de acuerdo a las marcas de los pulsadores y correcta distribución.', 'Chequear Parada de emergencia por buen funcionamiento y signos de daño.', 'Revisar antena por: deterioro, picaduras, danos y montaje.', 'Revisar estado de arnés de operador por : cortes, ajuste, deterioro (solo si aplica).', 'Realizar limpieza general.'] },
-  { key:'freno_de_izaje_gancho_principal', title:'FRENO DE IZAJE GANCHO PRINCIPAL', items:['Chequear estado de disco de fricción por: excesivo desgaste (acorde a manual), deterioro, trizaduras, daños (cambiar si es necesario). Indicar valores.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y reemplazar (sólo si es necesario). Indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Verificar apriete de pernos por torque adecuado.', 'Realizar limpieza general.'] },
-  { key:'freno_de_izaje_gancho_auxiliar', title:'FRENO DE IZAJE GANCHO AUXILIAR', items:['Chequear estado de disco de fricción por: excesivo desgaste (acorde a manual), deterioro, trizaduras, daños (cambiar si es necesario). Indicar valores.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y reemplazar (sólo si es necesario). Indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Verificar apriete de pernos por torque adecuado.', 'Realizar limpieza general.'] },
-  { key:'freno_de_traslacion_puente', title:'FRENO DE TRASLACIÓN PUENTE', items:['Chequear estado de disco de fricción por: excesivo desgaste (acorde a manual), deterioro, trizaduras, daños (cambiar si es necesario). Indicar valores.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y reemplazar (sólo si es necesario). Indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Verificar apriete de pernos por torque adecuado.', 'Realizar limpieza general.'] },
-  { key:'freno_de_traslacion_carro', title:'FRENO DE TRASLACIÓN CARRO', items:['Chequear estado de disco de fricción por: excesivo desgaste (acorde a manual), deterioro, trizaduras, daños (cambiar si es necesario). Indicar valores.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y reemplazar (sólo si es necesario). Indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Verificar apriete de pernos por torque adecuado.', 'Realizar limpieza general.'] },
-  { key:'traslacion_puente', title:'TRASLACIÓN PUENTE', items:['Efectuar recorrido traslación normal puente.', 'Chequear visualmente topes mecánicos por daño, desgaste, deformación, fijación y apropiada ubicación.', 'Revisar visualmente ruedas por: trizaduras, desgaste. Medir pestañas'] },
-  { key:'traslacion_carro', title:'TRASLACIÓN CARRO', items:['Efectuar recorrido traslación normal carro.', 'Chequear visualmente topes mecánicos por: daño, desgaste, deformación, fijación y apropiada ubicación.', 'Revisar visualmente ruedas por: trizaduras, desgaste. Medir pestañas'] },
-  { key:'cables_y_guias', title:'CABLES Y GUÍAS', items:['Desarmar (cada 6 meses) y revisar guía cable y evaluar por: deterioro, deformación, cualquier tipo de daño que afecte al cable. Lubricar', 'Inspección visual de cables por: hebras cortadas, cocas, deformación, corrosión, cualquier daño que afecte la seguridad del cable.', 'Medir reducción del diámetro nominal del cable (producto de desgaste externo/abrasión, desgaste interno y deterioro del núcleo). Indicar', 'Chequear visualmente conexión terminal del cable y prensa cable por: deterioro, desajuste, corrosión, deformación, desgaste.', 'Realizar limpieza y lubricación a cables cada 2 meses. Verificar que estén bien alojados en poleas y tambor.'] },
-  { key:'gancho_principal', title:'GANCHO PRINCIPAL', items:['Chequeo visual por: daños, grietas, melladuras, deformidad de la abertura de la garganta, corrosión y torcedura.', 'Revisar seguro del gancho por: desajuste, daño, deformación, apropiada operación.', 'Inspección auditiva a rodamientos por: deterioro, trabamientos, trizadura.'] },
-  { key:'gancho_auxiliar', title:'GANCHO AUXILIAR', items:['Chequeo visual por: daños, grietas, melladuras, deformidad de la abertura de la garganta, corrosión y torcedura.', 'Revisar seguro del gancho por: desajuste, daño, deformación, apropiada operación.', 'Inspección auditiva a rodamientos por: deterioro, trabamientos, trizadura.'] },
-  { key:'garras_antisismicas_puente', title:'GARRAS ANTISÍSMICAS PUENTE', items:['Chequear garras antisísmicas del puente por: deformación, corrosión, trizaduras, condición insegura.'] },
-  { key:'garras_antisismicas_carro', title:'GARRAS ANTISÍSMICAS CARRO', items:['Chequear garras antisísmicas del puente por: deformación, corrosión, trizaduras, condición insegura.'] },
-  { key:'polipasto_izaje_gancho_principal', title:'POLIPASTO IZAJE GANCHO PRINCIPAL', items:['Inspección visual de tambor enrollador por: desgaste, surcos afilados, grietas. Verificar cable bien alojado en los surcos del tambor.', 'Realizar inspección visual a estructura por: fisuras, deformaciones, corrosión, pernos sueltos, condición insegura.', 'Realizar inspección visual a bujes y eje pasador por: corrosión, deformación, grietas. Lubricar bujes y eje pasador.', 'Realizar limpieza general.'] },
-  { key:'poleas_izaje_gancho_principal', title:'POLEAS IZAJE GANCHO PRINCIPAL', items:['Realizar inspección visual a poleas por: corrosión, grietas, marcas de cable, deformación.', 'Realizar inspección visual a bujes y pasadores por: corrosión, deformación, grietas.', 'Realizar limpieza general.'] },
-  { key:'polipasto_izaje_gancho_auxiliar', title:'POLIPASTO IZAJE GANCHO AUXILIAR', items:['Inspección visual de tambor enrollador por: desgaste, surcos afilados, grietas. Verificar cable bien alojado en los surcos del tambor.', 'Realizar inspección visual a estructura por: fisuras, deformaciones, corrosión, pernos sueltos, condición insegura.', 'Realizar inspección visual a bujes y eje pasador por: corrosión, deformación, grietas. Lubricar bujes y eje pasador.', 'Realizar limpieza general.'] },
-  { key:'poleas_izaje_gancho_auxiliar', title:'POLEAS IZAJE GANCHO AUXILIAR', items:['Realizar inspección visual a poleas por: corrosión, grietas, marcas de cable, deformación.', 'Realizar inspección visual a bujes y pasadores por: corrosión, deformación, grietas.', 'Realizar limpieza general.'] },
-  { key:'contactores', title:'CONTACTORES', items:['Chequear estado de contactos eléctricos por : deterioro, medición resistividad en contactos de línea, sobrecalentamiento (desarmar si es... (texto incompleto en la fuente, completar)', 'Chequear bobina de contactores.', 'Limpiar y chequear correcta fijación de contactores.', 'Revisar apriete y marcar conexiones.'] },
-  { key:'banco_de_resistencias', title:'BANCO DE RESISTENCIAS', items:['Chequear estado de contactos eléctricos por : deterioro, medición resistividad en contactos de línea, sobrecalentamiento (desarmar si es... (texto incompleto en la fuente, completar)', 'Chequear bobina de contactores.', 'Limpiar y chequear correcta fijación de contactores.', 'Revisar apriete y marcar conexiones.', 'Chequear estado de canalizaciones.', 'Medir aislación respecto a los gabinetes.'] },
-  { key:'protecciones_electricas_de_fuerza', title:'PROTECCIONES ELÉCTRICAS DE FUERZA', items:['Chequear estado y funcionamiento de protecciones.', 'Revisar y verificar apriete de terminales y conexiones.', 'Chequear estado de contactos.', 'Ajustar guarda motor según datos de motor.'] },
-  { key:'gabinete_electrico_de_fuerza_y_control', title:'GABINETE ELÉCTRICO DE FUERZA Y CONTROL', items:['Limpiar y verificar apriete de conexiones de transformadores', 'Chequear estado de puertas, bisagras, chapas y sellos.', 'Verificar correcto peinado y rotulación de cables eléctricos.', 'Realizar limpieza general.'] },
-  { key:'alimentacion_electrica_puente', title:'ALIMENTACIÓN ELÉCTRICA PUENTE', items:['Inspección visual a brazo de arrastre por: pernos de sujeción, soldadura, perpendicularidad, deslizamiento.', 'Inspeccionar estado de tomacorriente, encapsulado, carbones, uniones, soportes, juntas de dilatación, gomas o sellos de polvo', 'Chequear topes mecánicos del riel.'] },
-  { key:'alimentacion_electrica_carro', title:'ALIMENTACIÓN ELÉCTRICA CARRO', items:['Inspeccionar estado de carros porta cables, verificar que corra libremente, apriete de las prensas, verificar que el loop sea igual para todos los cables, verificar estado de cadena/cable de arrastre.', 'Chequear topes mecánicos del riel.'] },
-  { key:'motores_de_traslacion_puente', title:'MOTORES DE TRASLACIÓN PUENTE', items:['Chequear anclaje motor por falta o desapriete de pernos. Chequear visualmente por grietas.', 'Realizar limpieza a estructura del motor.', 'Inspección visual de carcaza del motor y reductor por: deformación, corrosión, danos, filtraciones, etc.', 'Chequear caja reductora por: fugas, ruido, golpes, deterioro, apropiada lubricación (nivel de aceite)', 'Chequear apriete, marcas terminales y conexiones.', 'Verificar voltaje (indicar valores).', 'Chequear estado de ventiladores por: deterioro, cubiertas.', 'Realizar limpieza general.'] },
-  { key:'motores_de_traslacion_carro', title:'MOTORES DE TRASLACIÓN CARRO', items:['Chequear anclaje motor por falta o desapriete de pernos. Chequear visualmente por grietas.', 'Realizar limpieza a estructura del motor.', 'Inspección visual de carcaza del motor y reductor por: deformación, corrosión, daños, filtraciones, etc.', 'Chequear caja reductora por: fugas, ruido, golpes, deterioro, apropiada lubricación (nivel de aceite).', 'Chequear apriete, marcas terminales y conexiones.', 'Verificar voltaje (indicar valores).', 'Chequear estado de ventiladores por: deterioro, cubiertas.', 'Realizar limpieza general.'] },
-  { key:'motores_de_izaje_gancho_principal', title:'MOTORES DE IZAJE GANCHO PRINCIPAL', items:['Chequear anclaje motor por falta o desapriete de pernos. Chequear visualmente por grietas.', 'Realizar limpieza a estructura del motor.', 'Inspección visual de carcaza del motor y reductor por: deformación, corrosión, daños, filtraciones, etc.', 'Chequear caja reductora por: fugas, ruido, golpes, deterioro, apropiada lubricación (nivel de aceite)', 'Chequear apriete, marcas terminales y conexiones', 'Verificar voltaje (indicar valores).', 'Chequear estado de ventiladores por: deterioro, cubiertas.', 'Realizar limpieza general.'] },
-  { key:'motores_de_izaje_gancho_auxiliar', title:'MOTORES DE IZAJE GANCHO AUXILIAR', items:['Chequear anclaje motor por falta o desapriete de pernos. Chequear visualmente por grietas.', 'Realizar limpieza a estructura del motor.', 'Inspección visual de carcaza del motor y reductor por: deformación, corrosión, daños, filtraciones, etc.', 'Chequear caja reductora por: fugas, ruido, golpes, deterioro, apropiada lubricación (nivel de aceite)', 'Chequear apriete, marcas terminales y conexiones', 'Verificar voltaje (indicar valores).', 'Chequear estado de ventiladores por: deterioro, cubiertas.', 'Realizar limpieza general.'] },
+const PAUTA_POLIPASTO = [
+  { key:'alarma_y_senalizacion', title:'ALARMA Y SENALIZACION', items:['Revisar estado y funcionamiento de baliza y sirena en el sistema.', 'Chequear que la capacidad de la Grúa este indicada en la viga y sea legible desde el piso.', 'Chequear estado funcional del display de carga (Si aplica).'] },
+  { key:'limitador_traslacion_carro', title:'LIMITADOR TRASLACIÓN CARRO', items:['Chequear normal funcionamiento del limitador de traslación. El chequeo debe ser sin carga', 'Revisar actuadores y limitador traslación carro por: desgaste, instalación, trizadura, sujeción, etc.'] },
+  { key:'limitador_izaje_gancho_principal', title:'LIMITADOR IZAJE GANCHO PRINCIPAL', items:['Chequear estado y normal funcionamiento del limitador de carrera. El chequeo debe ser sin carga .', 'Revisar estado de cables y conexiones por sujeción y contactos.', 'Chequear estado y normal funcionamiento de segundo límite de carrera de seguridad. (Si aplica)', 'Verificar que al menos queden dos vueltas de seguridad cuando el gancho alcanza su posición más baja.'] },
+  { key:'dispositivo_limitador_de_cargas', title:'DISPOSITIVO LIMITADOR DE CARGAS', items:['Revisar funcionamiento eléctrico de limitador de carga por: deterioro, desgaste. Medir resistividad de contactos.'] },
+  { key:'sistema_de_mando_tipo_botonera', title:'SISTEMA DE MANDO TIPO BOTONERA', items:['Revisar estado y funcionamiento de pulsadores, parada de emergencia, cable de control y mensajero.', 'Desarmar botonera, verificar apriete de conexiones y limpieza de block de contactos. (Si aplica)'] },
+  { key:'sistema_de_mando_tipo_radio_control', title:'SISTEMA DE MANDO TIPO RADIO CONTROL', items:['Chequear correcto funcionamiento operacional de radio control y receptor.', 'Revisar Joystick, pulsadores, sellos, parada de emergencia, antena y arnés.'] },
+  { key:'freno_de_izaje_gancho_principal', title:'FRENO DE IZAJE GANCHO PRINCIPAL', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'freno_de_traslacion_carro', title:'FRENO DE TRASLACIÓN CARRO', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno y la distancia de detención sea normal.'] },
+  { key:'traslacion_carro', title:'TRASLACIÓN CARRO', items:['Chequear visualmente topes mecánicos por: daño, desgaste, deformación, fijación y apropiada ubicación.', 'Revisar visualmente ruedas y rodamientos por: trizaduras, desgaste.'] },
+  { key:'cables_y_guias', title:'CABLES Y GUÍAS', items:['Revisar guía cable y evaluar.', 'Inspección visual de cables por: hebras cortadas, cocas, deformación, corrosión.', 'Medir diámetro nominal del cable. Indicar medida', 'Chequear visualmente prensas y cuñas de cable por: deterioro, desajuste, corrosión, deformación, desgaste.', 'Realizar limpieza y lubricación a cables según estado. Verificar que estén bien alojados en poleas y tambor.'] },
+  { key:'gancho_principal', title:'GANCHO PRINCIPAL', items:['Chequeo visual de gancho, tapas, poleas, juntas plásticas, seguro.', 'Chequear funcionamiento de rodamientos de poleas, eje de gancho y buje.'] },
+  { key:'polipasto_izaje_gancho_principal', title:'POLIPASTO IZAJE GANCHO PRINCIPAL', items:['Inspección visual de tambor enrollador por: desgaste, surcos afilados, grietas. Verificar cable bien alojado en los surcos del tambor.', 'Realizar inspección visual a estructura por: fisuras, deformaciones, corrosión, pernos sueltos, condición insegura.', 'Realizar inspección visual a bujes y eje pasador de poleas superiores por: corrosión, deformación, grietas. Lubricar bujes y eje pasador.'] },
+  { key:'contactores_y_protecciones', title:'CONTACTORES Y PROTECCIONES', items:['Chequear estado de contactos eléctricos por : deterioro, medición resistividad en contactos de línea, sobrecalentamiento.', 'Chequear bobina de contactores.', 'Revisar apriete.'] },
+  { key:'transformadores', title:'TRANSFORMADORES', items:['Limpiar y verificar apriete de conexiones de transformadores'] },
+  { key:'gabinete_electrico_de_fuerza_y_control', title:'GABINETE ELÉCTRICO DE FUERZA Y CONTROL', items:['Chequear estado de puertas, bisagras, chapas y sellos.', 'Verificar correcto peinado y rotulación de cables eléctricos.'] },
+  { key:'alimentacion_electrica_carro', title:'ALIMENTACIÓN ELÉCTRICA CARRO', items:['Inspeccionar estado de Festoon o barra, carros porta cables, riel, uniones, brazo de arrastre.'] },
+  { key:'motores_de_traslacion_carro', title:'MOTORES DE TRASLACIÓN CARRO', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
+  { key:'motores_de_izaje_gancho_principal', title:'MOTORES DE IZAJE GANCHO PRINCIPAL', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
 ];
 
-const PAUTA_POLIPASTO = [
-  { key:'polipasto', title:'Polipasto', items:['Control del equipo', 'Información técnica del equipo', 'Mecanismos de Traslación Carro', 'Tablero F&C Carro', 'Alimentación Eléctrica', 'Elementos estructurales', 'Bloqueo Botonera', 'Sirena (en todos los movimientos)'] },
-  { key:'carro', title:'Carro', items:['Vías del Carro', 'Mecanismos de elevación Izaje Principal', 'Límite Carrera Carro', 'Limite Carrera Izaje'] },
-  { key:'izaje_principal', title:'Izaje Principal', items:['Tablero F&C Izaje Principal', 'Alimentación Eléctrica Izaje Principal', 'Cable Izaje Principal', 'Celda de carga', 'Baliza (al energizar)'] },
+const PAUTA_GRUA_1GANCHO = [
+  { key:'alarma_y_senalizacion', title:'ALARMA Y SENALIZACION', items:['Revisar estado y funcionamiento de baliza y sirena en el sistema.', 'Chequear que la capacidad de la Grúa esté indicada en la viga y sea legible desde el piso.', 'Chequear estado funcional del display de carga (Si aplica).'] },
+  { key:'limitador_traslacion_puente', title:'LIMITADOR TRASLACIÓN PUENTE', items:['Chequear normal funcionamiento del limitador de traslación. El chequeo debe ser sin carga', 'Revisar actuadores y limitador traslación puente por: desgaste, instalación, trizadura, sujeción, etc.'] },
+  { key:'limitador_traslacion_carro', title:'LIMITADOR TRASLACIÓN CARRO', items:['Chequear normal funcionamiento del limitador de traslación. El chequeo debe ser sin carga', 'Revisar actuadores y limitador traslación puente por: desgaste, instalación, trizadura, sujeción, etc.'] },
+  { key:'limitador_izaje_gancho_principal', title:'LIMITADOR IZAJE GANCHO PRINCIPAL', items:['Chequear estado y normal funcionamiento del limitador de carrera. El chequeo debe ser sin carga .', 'Revisar estado de cables y conexiones por sujeción y contactos.', 'Chequear estado y normal funcionamiento de segundo límite de carrera de seguridad. (Revisar periodicidad)', 'Verificar que al menos queden dos vueltas de seguridad cuando el gancho alcanza su posición más baja.'] },
+  { key:'dispositivo_limitador_de_cargas', title:'DISPOSITIVO LIMITADOR DE CARGAS', items:['Revisar funcionamiento eléctrico de limitador de carga por: deterioro, desgaste. Medir resistividad de contactos.'] },
+  { key:'sistema_de_mando_tipo_botonera', title:'SISTEMA DE MANDO TIPO BOTONERA', items:['Revisar estado y funcionamiento de pulsadores, parada de emergencia, cable de control y mensajero.', 'Desarmar botonera, verificar apriete de conexiones y limpieza de block de contactos. (Si aplica)'] },
+  { key:'sistema_de_mando_tipo_radio_control', title:'SISTEMA DE MANDO TIPO RADIO CONTROL', items:['Chequear correcto funcionamiento operacional de radio control y receptor.', 'Revisar Joystick, pulsadores, sellos, parada de emergencia, antena y arnés.'] },
+  { key:'freno_de_izaje_gancho_principal', title:'FRENO DE IZAJE GANCHO PRINCIPAL', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'freno_de_traslacion_puente', title:'FRENO DE TRASLACIÓN PUENTE', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'freno_de_traslacion_carro', title:'FRENO DE TRASLACIÓN CARRO', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'traslacion_puente', title:'TRASLACIÓN PUENTE', items:['Chequear visualmente topes mecánicos por daño, desgaste, deformación, fijación y apropiada ubicación.', 'Revisar visualmente ruedas por: trizaduras, desgaste. Medir pestañas'] },
+  { key:'traslacion_carro', title:'TRASLACIÓN CARRO', items:['Chequear visualmente topes mecánicos por: daño, desgaste, deformación, fijación y apropiada ubicación.', 'Revisar visualmente ruedas por: trizaduras, desgaste. Medir pestañas'] },
+  { key:'cables_y_guias', title:'CABLES Y GUÍAS', items:['Revisar guía cable y evaluar.', 'Inspección visual de cables por: hebras cortadas, cocas, deformación, corrosión.', 'Medir el diámetro nominal del cable principal y auxiliar. Indicar medida.', 'Chequear visualmente prensas y cuñas de cable por: deterioro, desajuste, corrosión, deformación, desgaste.', 'Realizar limpieza y lubricación a cables según estado. Verificar que estén bien alojados en poleas y tambor.'] },
+  { key:'gancho_principal', title:'GANCHO PRINCIPAL', items:['Chequeo visual de gancho, tapas, poleas, juntas plásticas, seguro.', 'Chequear funcionamiento de rodamientos de poleas, eje de gancho y buje.'] },
+  { key:'garras_antisismicas_puente', title:'GARRAS ANTISÍSMICAS PUENTE', items:['Chequear garras antisísmicas del puente por: deformación, corrosión, trizaduras, condición insegura.'] },
+  { key:'garras_antisismicas_carro', title:'GARRAS ANTISÍSMICAS CARRO', items:['Chequear garras antisísmicas del puente por: deformación, corrosión, trizaduras, condición insegura.'] },
+  { key:'polipasto_izaje_gancho_principal', title:'POLIPASTO IZAJE GANCHO PRINCIPAL', items:['Inspección visual de tambor enrollador por: desgaste, surcos afilados, grietas. Verificar cable bien alojado en los surcos del tambor.', 'Realizar inspección visual a estructura por: fisuras, deformaciones, corrosión, pernos sueltos, condición insegura.', 'Realizar inspección visual a bujes y eje pasador de poleas superiores por: corrosión, deformación, grietas. Lubricar bujes y eje pasador.'] },
+  { key:'contactores_y_protecciones', title:'CONTACTORES Y PROTECCIONES', items:['Chequear estado de contactos eléctricos por : deterioro, medición resistividad en contactos de línea, sobrecalentamiento.', 'Chequear bobina de contactores.', 'Revisar apriete.'] },
+  { key:'banco_de_resistencias', title:'BANCO DE RESISTENCIAS', items:['Limpiar y chequear correcta fijación.', 'Medir resistencia según diseño fabricante. Indicar valor'] },
+  { key:'transformadores', title:'TRANSFORMADORES', items:['Limpiar y verificar apriete de conexiones de transformadores'] },
+  { key:'gabinete_electrico_de_fuerza_y_control', title:'GABINETE ELÉCTRICO DE FUERZA Y CONTROL', items:['Chequear estado de puertas, bisagras, chapas y sellos.', 'Verificar correcto peinado y rotulación de cables eléctricos.'] },
+  { key:'alimentacion_electrica_puente', title:'ALIMENTACIÓN ELÉCTRICA PUENTE', items:['Inspección visual de Barras de alimentación, Uniones de barra y soportes, brazo de arrastre, tomacorriente.'] },
+  { key:'alimentacion_electrica_carro', title:'ALIMENTACIÓN ELÉCTRICA CARRO', items:['Inspeccionar estado de Festoon, carros porta cables, riel, uniones, brazo de arrastre.'] },
+  { key:'motores_de_traslacion_puente', title:'MOTORES DE TRASLACIÓN PUENTE', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
+  { key:'motores_de_traslacion_carro', title:'MOTORES DE TRASLACIÓN CARRO', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
+  { key:'motores_de_izaje_gancho_principal', title:'MOTORES DE IZAJE GANCHO PRINCIPAL', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
+];
+
+const PAUTA_GRUA_2GANCHOS = [
+  { key:'alarma_y_senalizacion', title:'ALARMA Y SENALIZACION', items:['Revisar estado y funcionamiento de baliza y sirena en el sistema.', 'Chequear que la capacidad del Grúa este indicada en la viga y sea legible desde el piso.', 'Chequear estado funcional del display de carga (Si aplica).'] },
+  { key:'limitador_traslacion_puente', title:'LIMITADOR TRASLACIÓN PUENTE', items:['Chequear normal funcionamiento del limitador de traslación. El chequeo debe ser sin carga', 'Revisar actuadores y limitador traslación puente por: desgaste, instalación, trizadura, sujeción, etc.'] },
+  { key:'limitador_traslacion_carro', title:'LIMITADOR TRASLACIÓN CARRO', items:['Chequear normal funcionamiento del limitador de traslación. El chequeo debe ser sin carga', 'Revisar actuadores y limitador traslación puente por: desgaste, instalación, trizadura, sujeción, etc.'] },
+  { key:'limitador_izaje_gancho_principal', title:'LIMITADOR IZAJE GANCHO PRINCIPAL', items:['Chequear estado y normal funcionamiento del limitador de carrera. El chequeo debe ser sin carga .', 'Revisar estado de cables y conexiones por sujeción y contactos.', 'Chequear estado y normal funcionamiento de segundo límite de carrera de seguridad. (Revisar periodicidad)', 'Verificar que al menos queden dos vueltas de seguridad cuando el gancho alcanza su posición más baja.'] },
+  { key:'limitador_izaje_gancho_auxiliar', title:'LIMITADOR IZAJE GANCHO AUXILIAR', items:['Chequear estado y normal funcionamiento del limitador de carrera. El chequeo debe ser sin carga .', 'Revisar estado de cables y conexiones por sujeción y contactos.', 'Chequear estado y normal funcionamiento de segundo límite de carrera de seguridad. (Revisar periodicidad)', 'Verificar que al menos queden dos vueltas de seguridad cuando el gancho alcanza su posición más baja.'] },
+  { key:'dispositivo_limitador_de_cargas', title:'DISPOSITIVO LIMITADOR DE CARGAS', items:['Revisar funcionamiento eléctrico de limitador de carga por: deterioro, desgaste. Medir resistividad de contactos.'] },
+  { key:'sistema_de_mando_tipo_botonera', title:'SISTEMA DE MANDO TIPO BOTONERA', items:['Revisar estado y funcionamiento de pulsadores, parada de emergencia, cable de control y mensajero.', 'Desarmar botonera, verificar apriete de conexiones y limpieza de block de contactos. (Si aplica)'] },
+  { key:'sistema_de_mando_tipo_radio_control', title:'SISTEMA DE MANDO TIPO RADIO CONTROL', items:['Chequear correcto funcionamiento operacional de radio control y receptor.', 'Revisar Joystick, pulsadores, sellos, parada de emergencia, antena y arnés.'] },
+  { key:'freno_de_izaje_gancho_principal', title:'FRENO DE IZAJE GANCHO PRINCIPAL', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'freno_de_izaje_gancho_auxiliar', title:'FRENO DE IZAJE GANCHO AUXILIAR', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'freno_de_traslacion_puente', title:'FRENO DE TRASLACIÓN PUENTE', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'freno_de_traslacion_carro', title:'FRENO DE TRASLACIÓN CARRO', items:['Chequear y mantener estado de disco de fricción y balata. Indicar espesor de balata.', 'Chequear estado de seguros seeger (omega) y chaveta.', 'Chequear resistividad de bobinas electromagnéticas y rectificador. Reemplazar si es necesario. Indicar valores', 'Regular entrehierro de freno (air gap) y chequear torque de freno (acorde a manual) e indicar valores.', 'Revisar funcionamiento de freno, que no exista deslizamiento y la distancia de detención sea normal.'] },
+  { key:'traslacion_puente', title:'TRASLACIÓN PUENTE', items:['Chequear visualmente topes mecánicos por daño, desgaste, deformación, fijación y apropiada ubicación.', 'Revisar visualmente ruedas por: trizaduras, desgaste. Medir pestañas'] },
+  { key:'traslacion_carro', title:'TRASLACIÓN CARRO', items:['Chequear visualmente topes mecánicos por: daño, desgaste, deformación, fijación y apropiada ubicación.', 'Revisar visualmente ruedas por: trizaduras, desgaste. Medir pestañas'] },
+  { key:'cables_y_guias', title:'CABLES Y GUÍAS', items:['Revisar guía cable y evaluar.', 'Inspección visual de cables por: hebras cortadas, cocas, deformación, corrosión.', 'Medir diámetro nominal del cable principal y auxiliar. Indicar medida', 'Chequear visualmente prensas y cuñas de cable por: deterioro, desajuste, corrosión, deformación, desgaste.', 'Realizar limpieza y lubricación a cables según estado. Verificar que estén bien alojados en poleas y tambor.'] },
+  { key:'gancho_principal', title:'GANCHO PRINCIPAL', items:['Chequeo visual de gancho, tapas, poleas, juntas plásticas, seguro.', 'Chequear funcionamiento de rodamientos de poleas, eje de gancho y buje.'] },
+  { key:'gancho_auxiliar', title:'GANCHO AUXILIAR', items:['Chequeo visual de gancho, tapas, poleas, juntas plásticas, seguro.', 'Chequear funcionamiento de rodamientos de poleas, eje de gancho y buje.'] },
+  { key:'garras_antisismicas_puente', title:'GARRAS ANTISÍSMICAS PUENTE', items:['Chequear garras antisísmicas del puente por: deformación, corrosión, trizaduras, condición insegura.'] },
+  { key:'garras_antisismicas_carro', title:'GARRAS ANTISÍSMICAS CARRO', items:['Chequear garras antisísmicas del puente por: deformación, corrosión, trizaduras, condición insegura.'] },
+  { key:'polipasto_izaje_gancho_principal', title:'POLIPASTO IZAJE GANCHO PRINCIPAL', items:['Inspección visual de tambor enrollador por: desgaste, surcos afilados, grietas. Verificar cable bien alojado en los surcos del tambor.', 'Realizar inspección visual a estructura por: fisuras, deformaciones, corrosión, pernos sueltos, condición insegura.', 'Realizar inspección visual a bujes y eje pasador de poleas superiores por: corrosión, deformación, grietas. Lubricar bujes y eje pasador.'] },
+  { key:'polipasto_izaje_gancho_auxiliar', title:'POLIPASTO IZAJE GANCHO AUXILIAR', items:['Inspección visual de tambor enrollador por: desgaste, surcos afilados, grietas. Verificar cable bien alojado en los surcos del tambor.', 'Realizar inspección visual a estructura por: fisuras, deformaciones, corrosión, pernos sueltos, condición insegura.', 'Realizar inspección visual a bujes y eje pasador de poleas superiores por: corrosión, deformación, grietas. Lubricar bujes y eje pasador.'] },
+  { key:'contactores_y_protecciones', title:'CONTACTORES Y PROTECCIONES', items:['Chequear estado de contactos eléctricos por : deterioro, medición resistividad en contactos de línea, sobrecalentamiento.', 'Chequear bobina de contactores.', 'Revisar apriete.'] },
+  { key:'banco_de_resistencias', title:'BANCO DE RESISTENCIAS', items:['Limpiar y chequear correcta fijación.', 'Medir resistencia según diseño fabricante. Indicar valor'] },
+  { key:'transformadores', title:'TRANSFORMADORES', items:['Limpiar y verificar apriete de conexiones de transformadores'] },
+  { key:'gabinete_electrico_de_fuerza_y_control', title:'GABINETE ELÉCTRICO DE FUERZA Y CONTROL', items:['Chequear estado de puertas, bisagras, chapas y sellos.', 'Verificar correcto peinado y rotulación de cables eléctricos.'] },
+  { key:'alimentacion_electrica_puente', title:'ALIMENTACIÓN ELÉCTRICA PUENTE', items:['Inspección visual de Barras de alimentación, Uniones de barra y soportes, brazo de arrastre, tomacorriente.'] },
+  { key:'alimentacion_electrica_carro', title:'ALIMENTACIÓN ELÉCTRICA CARRO', items:['Inspeccionar estado de Festoon, carros porta cables, riel, uniones, brazo de arrastre.'] },
+  { key:'motores_de_traslacion_puente', title:'MOTORES DE TRASLACIÓN PUENTE', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
+  { key:'motores_de_traslacion_carro', title:'MOTORES DE TRASLACIÓN CARRO', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
+  { key:'motores_de_izaje_gancho_principal', title:'MOTORES DE IZAJE GANCHO PRINCIPAL', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
+  { key:'motores_de_izaje_gancho_auxiliar', title:'MOTORES DE IZAJE GANCHO AUXILIAR', items:['Inspección visual del motor y reductor por: deformación, corrosión, daños, filtraciones.', 'Chequear nivel de aceite en caja reductora. Verificar ruidos en funcionamiento', 'Chequear caja conexiones. Realizar reapriete', 'Medir resistencia de bobinas. Medir aislación 1 vez al año', 'Medir corriente. Dejar registro'] },
 ];
 
 const PAUTA_TECLE = [
@@ -3384,9 +3440,8 @@ const PAUTA_TECLE = [
     'Limpieza general del equipo.',
   ]}
 ];
-
 const PAUTA_GENERICA_FALLBACK = [
-  { key:'general', title:'INSPECCIÓN GENERAL (pauta genérica — equipo sin pauta específica aún)', items:[
+  { key:'general', title:'INSPECCIÓN GENERAL (pauta genérica — equipo sin pauta asignada aún)', items:[
     'Estado del gancho y seguro de gancho.',
     'Estado del cable/cadena de izaje.',
     'Freno de izaje y de traslación.',
@@ -3398,32 +3453,58 @@ const PAUTA_GENERICA_FALLBACK = [
   ]}
 ];
 
-function itemsPorTipo(tipo){
-  if(!tipo) return PAUTA_GENERICA_FALLBACK;
-  if(['Puente Grúa','Semi Portal','Portal'].includes(tipo)) return PAUTA_GRUA;
-  if(['Polipasto','Polipasto Recto','Monorriel Recto'].includes(tipo)) return PAUTA_POLIPASTO;
-  if(tipo === 'Tecle') return PAUTA_TECLE;
-  return PAUTA_GENERICA_FALLBACK;
+// Asignacion equipo -> familia de pauta, confirmada por Mario (24-sep-2026):
+//  - EQ01 Puente Grua Truck Shop (35/5 T): 2 ganchos (confirmado por Mario)
+//  - EQ02 Portal CHP (10 T): 1 gancho (dato real LOOP, GPO-CH-PRIM)
+//  - EQ03-EQ08 Polipastos/Monorrieles: pauta de 53 (dato real LOOP en EQ07/EQ08)
+//  - EQ09 Semi Portal CHS/T (40/5 T): 2 ganchos (dato real LOOP, SPO-CH-SEC-TER)
+//  - EQ10 Puente Grua Taller Mantencion: 1 gancho, mantenido por LOOP (confirmado)
+//  - EQ11 Puente Grua EW-SX Despegadora Catodos: posible "MRDC" -- Mario indico que
+//    ese puente de Humeda lo mantiene personal Antucoya, no LOOP. Se le asigna igual
+//    la pauta de 1 gancho por ser la que corresponde a su estructura (1 gancho, con
+//    Puente) -- OJO: si "MRDC" no es este equipo, avisar para corregir.
+//  - EQ12 EW-SX Lado Sur: 1 gancho, mantenido por LOOP (confirmado, "2 puentes en Humeda")
+//  - EQ13 EW-SX Lado Norte: 1 gancho, mantenido por LOOP (confirmado)
+//  - EQ14 Tecle Blackbear: sin dato real de LOOP (equipo nuevo) -- se mantiene la
+//    pauta generica corta ya existente.
+const PAUTA_ASIGNADA_POR_EQUIPO = {
+  'EQ01': 'grua2g',   // Puente Grua Truck Shop, 35/5 T
+  'EQ02': 'grua1g',   // Portal CHP, 10 T
+  'EQ03': 'polipasto',// Polipasto CV01 CHP
+  'EQ04': 'polipasto',// Polipasto CV02 CHP
+  'EQ05': 'polipasto',// Monorriel Recto CV01-CV02 CHP
+  'EQ06': 'grua2g',   // Semi Portal CHS/T, 40/5 T
+  'EQ07': 'polipasto',// Polipasto Recto Feeder CHS
+  'EQ08': 'polipasto',// Polipasto Recto Feeder CHT
+  'EQ09': 'grua1g',   // Puente Grua Taller de Mantencion, 10 T
+  'EQ10': 'polipasto',// Monorriel Recto Planta Piloto
+  'EQ11': 'grua1g',   // EW-SX Despegadora Catodos (posible "MRDC")
+  'EQ12': 'grua1g',   // EW-SX Lado Sur
+  'EQ13': 'grua1g',   // EW-SX Lado Norte
+  'EQ14': 'tecle',    // Tecle Blackbear
+};
+
+function itemsPorTipo(tipo, equipoId){
+  const asignada = PAUTA_ASIGNADA_POR_EQUIPO[equipoId];
+  if(asignada === 'grua2g') return PAUTA_GRUA_2GANCHOS;
+  if(asignada === 'grua1g') return PAUTA_GRUA_1GANCHO;
+  if(asignada === 'polipasto') return PAUTA_POLIPASTO;
+  if(asignada === 'tecle') return PAUTA_TECLE;
+  return PAUTA_GENERICA_FALLBACK; // equipo nuevo agregado sin asignar aun -> pauta corta generica
 }
 
 function buildMttoPauta(){
   const equipoId = document.getElementById('f_equipo') ? document.getElementById('f_equipo').value : '';
   const equipo = equipos.find(e => e.id === equipoId);
   const tipo = equipo ? equipo.categoria : null;
-  return itemsPorTipo(tipo).map(sec => ({ key: sec.key, title: sec.title, items: sec.items }));
+  return itemsPorTipo(tipo, equipoId).map(sec => ({ key: sec.key, title: sec.title, items: sec.items }));
 }
 
-// Pauta de INSPECCIÓN — DERIVADA automáticamente de la pauta de Mantención (ANT-111,
-// patrón §70.5 del estándar): un ítem-resumen por sección ("Estado general — <sección>"),
-// nunca se duplica contenido técnico a mano en un lugar aparte. Si cambian los ítems de
-// Mantención, la pauta de Inspección se actualiza sola y no queda desalineada.
-// ES LA VERSIÓN FUNCIONAL CORRECTA, no la definitiva — Mario la afina con los técnicos.
+// Pauta de INSPECCIÓN — misma tabla que Mantención (a diferencia de Compresores,
+// aquí no separamos Inspección/Mantención por ahora: se define en la próxima iteración
+// una vez que LOOP confirme si aplica una pauta reducida para inspección diaria/semanal.
 function buildInspeccionPauta(){
-  return buildMttoPauta().map(sec => ({
-    key: sec.key,
-    title: sec.title,
-    items: [`Estado general — ${sec.title}`]
-  }));
+  return buildMttoPauta();
 }
 
 
@@ -3579,7 +3660,7 @@ async function saveTecnicos(){ await storage.set('tecnicos_master', tecnicos); }
 async function saveSupervisores(){ await storage.set('supervisores_master', supervisores); }
 
 /* ============================================================
-   FOLIO AUTOMÁTICO — [AREA]-PG-[AÑO]-[CORRELATIVO]
+   FOLIO AUTOMÁTICO — [AREA]-COMP-[AÑO]-[CORRELATIVO]
    ============================================================ */
 async function previewFolio(area){
   if(!area) return '';
@@ -3587,7 +3668,7 @@ async function previewFolio(area){
   const year = new Date().getFullYear();
   const key = `folio_counter:${code}:${year}`;
   const current = (await storage.get(key)) || 0;
-  return `${code}-PG-${year}-${String(current+1).padStart(4,'0')}`;
+  return `${code}-COMP-${year}-${String(current+1).padStart(4,'0')}`;
 }
 async function commitFolio(area){
   if(!area) return '';
@@ -3597,7 +3678,7 @@ async function commitFolio(area){
   const current = (await storage.get(key)) || 0;
   const next = current + 1;
   await storage.set(key, next);
-  return `${code}-PG-${year}-${String(next).padStart(4,'0')}`;
+  return `${code}-COMP-${year}-${String(next).padStart(4,'0')}`;
 }
 
 /* ============================================================
@@ -3781,6 +3862,9 @@ function applyEquipoToForm(equipo){
   document.getElementById('f_serie').value = equipo ? equipo.serie : '';
   document.getElementById('f_interno').value = equipo ? (equipo.interno || equipo.nombre) : '';
   document.getElementById('f_ubicacion').value = equipo ? equipo.ubicacion : '';
+  document.getElementById('horometroWarning').style.display = 'none';
+  document.getElementById('horometroJustWrap').style.display = 'none';
+  document.getElementById('f_horometroJust').value = '';
   renderHistorialEquipoMini(equipo);
   renderReferenciaMtto(equipo);
   renderRepuestosUsados();
@@ -3946,6 +4030,22 @@ async function renderHistorialEquipoMini(equipo){
   box.style.cssText = 'display:block;background:var(--paper);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--muted);margin-top:2px;';
   box.innerHTML = `<b style="color:${cls};">● Última inspección de este equipo:</b> ${esc(ultimo.fecha||'—')} · ${esc(ultimo.equipoLabel||'')} · <b style="color:${cls};">${estadoTxt}</b> (${previos.length} registro${previos.length>1?'s':''} en total)`;
 }
+
+document.getElementById('f_horometro').addEventListener('input', async () => {
+  const equipoId = document.getElementById('f_equipo').value;
+  const equipo = equipos.find(e => e.id === equipoId);
+  const warnBox = document.getElementById('horometroWarning');
+  const justWrap = document.getElementById('horometroJustWrap');
+  const val = parseFloat(document.getElementById('f_horometro').value);
+  if(equipo && equipo.ultimoHorometro != null && !isNaN(val) && val < equipo.ultimoHorometro){
+    warnBox.style.display = 'block';
+    warnBox.textContent = `⚠ El horómetro ingresado (${val}) es menor al último registrado para este equipo (${equipo.ultimoHorometro} h). Justifica para continuar.`;
+    justWrap.style.display = 'block';
+  } else {
+    warnBox.style.display = 'none';
+    justWrap.style.display = 'none';
+  }
+});
 
 document.getElementById('f_intervalo').addEventListener('change', (e) => {
   document.getElementById('f_tiposervicio').value = 'MANTENCIÓN — ' + e.target.value;
@@ -4137,6 +4237,8 @@ async function resumeDraft(draft){
   document.getElementById('f_serie').value = draft.serie || '';
   document.getElementById('f_interno').value = draft.interno || '';
   document.getElementById('f_ubicacion').value = draft.ubicacion || '';
+  document.getElementById('f_horometro').value = draft.horometro || '';
+  document.getElementById('f_horometroJust').value = draft.horometroJustificacion || '';
   document.getElementById('f_hallazgos').value = draft.hallazgos || '';
   document.getElementById('f_entregadoA').value = draft.entregadoA || '';
   document.getElementById('f_cargo').value = draft.cargo || '';
@@ -4197,6 +4299,7 @@ function startNewForm(servicio){
   document.getElementById('f_horainicio').value = nowTimeHHMM();
   document.getElementById('f_horatermino').value = '';
 
+  document.getElementById('f_horometro').value = '';
   document.getElementById('f_hallazgos').value = '';
   document.getElementById('f_entregadoA').value = '';
   document.getElementById('f_cargo').value = '';
@@ -4534,6 +4637,8 @@ function buildRecord(){
     serie: document.getElementById('f_serie').value,
     interno: document.getElementById('f_interno').value,
     ubicacion: document.getElementById('f_ubicacion').value,
+    horometro: document.getElementById('f_horometro').value,
+    horometroJustificacion: document.getElementById('f_horometroJust').value,
     items: itemState,
     itemsDescriptivos: buildItemsDescriptivos(),
     photos: photoState,
@@ -4585,12 +4690,6 @@ function repuestosRealizadosSinFoto(){
     s && s.status === 'realizado' && (!photoState[aid] || !photoState[aid].length)
   );
 }
-// ANT-109: la criticidad de un ítem MALO se mostraba en la UI pero no bloqueaba el
-// guardado si quedaba sin seleccionar. Este chequeo replica el patrón que ya usa
-// Compresores para exigirla de verdad antes de guardar.
-function itemsSinCriticidad(){
-  return Object.entries(itemState).filter(([key, s]) => s.status === 'malo' && !s.criticidad);
-}
 async function saveRecord(){
   const pendientes = Object.values(itemState).filter(s => !s.status).length;
   if(pendientes){
@@ -4603,12 +4702,6 @@ async function saveRecord(){
     renderSections();
     return false;
   }
-  const sinCriticidad = itemsSinCriticidad();
-  if(sinCriticidad.length){
-    toast(`✕ Hay ${sinCriticidad.length} ítem(s) MALO sin criticidad seleccionada. Indica Crítica/Alta/Media/Baja para poder guardar.`);
-    renderSections();
-    return false;
-  }
   const repuestosSinFoto = repuestosRealizadosSinFoto();
   if(repuestosSinFoto.length){
     toast(`✕ Hay ${repuestosSinFoto.length} repuesto(s) marcados REALIZADO sin foto de evidencia. Sube al menos 1 foto por cada uno.`);
@@ -4616,9 +4709,10 @@ async function saveRecord(){
     renderPlannedMaintenance(equipoActual);
     return false;
   }
+  // Puentes Grua/Polipastos no usa horometro (mantencion por plan/calendario) — se quita la
+  // validacion obligatoria de horometro que traia la plantilla de Compresores.
   const equipoId = document.getElementById('f_equipo').value;
   if(!equipoId){ toast('✕ Selecciona un equipo antes de guardar.'); return false; }
-  if(!document.getElementById('f_ot').value.trim()){ toast('✕ Falta indicar el N° de OT antes de guardar.'); return false; }
   if(!document.getElementById('f_completadoPor').value){ toast('✕ Falta indicar quién completa este registro (arriba de todo).'); return false; }
 
   const rec = buildRecord();
@@ -4628,6 +4722,15 @@ async function saveRecord(){
   try{
     await storage.set('registro:' + rec.id, rec);
     await updateIndex(rec);
+    // actualizar último horómetro del equipo para futuras validaciones — nunca hacia abajo,
+    // aunque se reabra y regrabe un informe antiguo con un valor menor (ya justificado).
+    const equipo = equipos.find(e => e.id === equipoId);
+    const horVal = parseFloat(document.getElementById('f_horometro').value);
+    if(equipo && !isNaN(horVal) && (equipo.ultimoHorometro == null || horVal > equipo.ultimoHorometro)){
+      equipo.ultimoHorometro = horVal;
+      equipo.ultimaFecha = rec.fecha;
+      await saveEquipos();
+    }
     document.getElementById('recIdLabel').textContent = 'guardado · ' + rec.id;
     document.getElementById('btnDelete').style.display = 'block';
     toast('✓ Guardado (' + sizeKB + ' KB)');
@@ -5003,6 +5106,8 @@ async function loadRecordIntoForm(id){
   document.getElementById('f_serie').value = rec.serie || '';
   document.getElementById('f_interno').value = rec.interno || '';
   document.getElementById('f_ubicacion').value = rec.ubicacion || '';
+  document.getElementById('f_horometro').value = rec.horometro || '';
+  document.getElementById('f_horometroJust').value = rec.horometroJustificacion || '';
   document.getElementById('f_hallazgos').value = rec.hallazgos || '';
   document.getElementById('f_entregadoA').value = rec.entregadoA || '';
   document.getElementById('f_cargo').value = rec.cargo || '';
@@ -5039,24 +5144,6 @@ function historyRowHTML(item){
 let histSearchTerm = '';
 document.getElementById('histSearch').addEventListener('input', (e) => {
   histSearchTerm = e.target.value.trim().toLowerCase();
-  loadHistory();
-});
-// Filtro de fecha (§77) — Desde/Hasta se combinan con los filtros de tipo/texto que ya
-// existen, no los reemplazan. Vacíos = sin restricción por ese lado.
-let histDateFrom = '';
-let histDateTo = '';
-document.getElementById('histDateFrom').addEventListener('change', (e) => {
-  histDateFrom = e.target.value; loadHistory();
-});
-document.getElementById('histDateTo').addEventListener('change', (e) => {
-  histDateTo = e.target.value; loadHistory();
-});
-document.getElementById('btnHist7d').addEventListener('click', () => {
-  const desde = new Date(); desde.setDate(desde.getDate() - 7);
-  histDateTo = todayISO();
-  histDateFrom = desde.toISOString().slice(0,10);
-  document.getElementById('histDateFrom').value = histDateFrom;
-  document.getElementById('histDateTo').value = histDateTo;
   loadHistory();
 });
 
@@ -5101,38 +5188,18 @@ async function loadHistory(){
     return true;
   });
 
-  // Filtro de fecha (§77) — se aplica DESPUÉS de los filtros de tipo/texto de arriba,
-  // sobre el campo "fecha" (la del servicio, no savedAt/updatedAt), igual en ambos orígenes.
-  const dentroDeRango = (fechaStr) => {
-    if(!fechaStr) return !histDateFrom && !histDateTo; // sin fecha: solo entra si no hay filtro activo
-    if(histDateFrom && fechaStr < histDateFrom) return false;
-    if(histDateTo && fechaStr > histDateTo) return false;
-    return true;
-  };
-  const idxEnRango = idx.filter(x => dentroDeRango(x.fecha));
-  const remotosEnRango = remotosFiltrados.filter(r => dentroDeRango(r.fecha));
+  if(!idx.length && !remotosFiltrados.length){ list.innerHTML = `<div class="empty-state">Sin registros que coincidan.</div>`; return; }
 
-  if(!idxEnRango.length && !remotosEnRango.length){ list.innerHTML = `<div class="empty-state">Sin registros que coincidan.</div>`; return; }
+  const localesHTML = idx.map(item => `<div style="display:flex;align-items:center;">
+      <div style="flex:1;">${historyRowHTML(item)}</div>
+      <button class="hist-del" data-del="${item.id}" style="margin-right:10px;">🗑</button>
+    </div>`).join('');
+  const remotosHTML = await Promise.all(remotosFiltrados.map(async r => `<div style="display:flex;align-items:center;">
+      <div style="flex:1;">${await remoteRowHTML(r)}</div>
+      <button class="hist-del" data-delremote="${esc(r.id)}" style="margin-right:10px;">🗑</button>
+    </div>`));
 
-  // Fusión en UNA sola lista cronológica (§1.2 del paquete) — antes se mostraban dos
-  // bloques separados (locales, luego remotos) sin relación entre sí. Se ordena por la
-  // fecha del servicio, y como desempate entre registros del mismo día se usa el momento
-  // de guardado (savedAt local / updatedAt remoto), más reciente primero.
-  const filas = [
-    ...idxEnRango.map(item => ({ origin: 'local', fecha: item.fecha || '', ord: item.savedAt || '', data: item })),
-    ...remotosEnRango.map(r => ({ origin: 'remote', fecha: r.fecha || '', ord: r.updatedAt || '', data: r }))
-  ].sort((a, b) => (b.fecha + b.ord).localeCompare(a.fecha + a.ord));
-
-  const filasHTML = await Promise.all(filas.map(async f => {
-    const inner = f.origin === 'local' ? historyRowHTML(f.data) : await remoteRowHTML(f.data);
-    const delAttr = f.origin === 'local' ? `data-del="${f.data.id}"` : `data-delremote="${esc(f.data.id)}"`;
-    return `<div style="display:flex;align-items:center;">
-      <div style="flex:1;">${inner}</div>
-      <button class="hist-del" ${delAttr} style="margin-right:10px;">🗑</button>
-    </div>`;
-  }));
-
-  list.innerHTML = filasHTML.join('');
+  list.innerHTML = localesHTML + remotosHTML.join('');
   list.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', () => loadRecordIntoForm(el.dataset.open)));
   list.querySelectorAll('[data-remote]').forEach(el => el.addEventListener('click', () => openRemoteDetail(el.dataset.remote)));
   list.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', async (e) => {
@@ -5412,7 +5479,8 @@ document.getElementById('btnCompartir').addEventListener('click', async () => {
   const servicioLabel = currentServicio === 'inspeccion' ? 'Inspección' : 'Mantención';
   const ninforme = document.getElementById('f_ninforme').value || 's/n';
   const fecha = document.getElementById('f_fecha').value || '—';
-  const texto = `${servicioLabel} — ${equipoNombre}\nFolio: ${ninforme}\nFecha: ${fecha}\n\nResultado: ${counts.bueno} Bueno / ${counts.regular} Regular / ${counts.malo} Malo\nEstado: ${estado.label}`;
+  const horometro = document.getElementById('f_horometro').value || '—';
+  const texto = `${servicioLabel} — ${equipoNombre}\nFolio: ${ninforme}\nFecha: ${fecha}${horometro ? ' · Horómetro/OT: ' + horometro : ''}\n\nResultado: ${counts.bueno} Bueno / ${counts.regular} Regular / ${counts.malo} Malo\nEstado: ${estado.label}`;
   // Respaldo: siempre queda copiado al portapapeles, aunque el share nativo no
   // rellene bien el correo (en computador a veces no carga el cuerpo del mensaje).
   if(navigator.clipboard){ try{ await navigator.clipboard.writeText(texto); }catch(e){} }
@@ -5485,6 +5553,7 @@ async function generarInformePDF(){
   const serie = document.getElementById('f_serie').value || '—';
   const interno = document.getElementById('f_interno').value || '—';
   const ubicacion = document.getElementById('f_ubicacion').value || '—';
+  const horometro = document.getElementById('f_horometro').value || '—';
   const hallazgos = document.getElementById('f_hallazgos').value.trim();
   const entregadoA = document.getElementById('f_entregadoA').value || '—';
   const cargo = document.getElementById('f_cargo').value || '—';
@@ -5513,7 +5582,8 @@ async function generarInformePDF(){
     `Supervisor: ${supervisor}`,
     `Hora inicio: ${horainicio}   Hora término: ${horatermino}`,
     `N° Interno/TAG: ${interno}`,
-    `Ubicación: ${ubicacion}`
+    `Ubicación: ${ubicacion}`,
+    horometro ? `Horómetro/OT: ${horometro}` : ''
   ].filter(Boolean).forEach(linea => { doc.text(linea, marginX, y); y += 5; });
   doc.setFont('helvetica','bold');
   doc.text(`ESTADO: ${estado.label}`, marginX, y); y += 7;
@@ -5696,6 +5766,7 @@ function buildPrintArea(){
   const serie = document.getElementById('f_serie').value || '—';
   const interno = document.getElementById('f_interno').value || '—';
   const ubicacion = document.getElementById('f_ubicacion').value || '—';
+  const horometro = document.getElementById('f_horometro').value || '—';
   const hallazgos = document.getElementById('f_hallazgos').value.trim();
   const entregadoA = document.getElementById('f_entregadoA').value || '—';
   const cargo = document.getElementById('f_cargo').value || '—';
@@ -5843,7 +5914,7 @@ async function exportCSV(){
   try{
     const rows = await storage.allEntries('registro:');
     if(!rows.length){ toast('No hay registros para exportar'); return; }
-    const headers = ['Folio','Fecha','Servicio','Equipo','Marca','Modelo','Capacidad','Técnico','Supervisor','Estado','Bueno','Regular','Malo','N/A'];
+    const headers = ['Folio','Fecha','Servicio','Equipo','Marca','Modelo','Capacidad','Horómetro/OT','Técnico','Supervisor','Estado','Bueno','Regular','Malo','N/A'];
     const lines = [headers.join(';')];
     rows.forEach(r => {
       const rec = r.value;
@@ -5853,14 +5924,14 @@ async function exportCSV(){
       const servicioLabel = rec.servicio === 'inspeccion' ? 'Inspección' : 'Mantención';
       lines.push([
         rec.ninforme, rec.fecha, servicioLabel, rec.interno || rec.modelo, rec.marca, rec.modelo, rec.serie,
-        rec.tecnico, rec.supervisor, estado.label, counts.bueno, counts.regular, counts.malo, naCount
+        rec.horometro, rec.tecnico, rec.supervisor, estado.label, counts.bueno, counts.regular, counts.malo, naCount
       ].map(csvEscape).join(';'));
     });
     const csv = '\uFEFF' + lines.join('\n'); // BOM para que Excel abra bien las tildes
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `registros_puentes_grua_ant_${todayISO()}.csv`;
+    a.href = url; a.download = `inspecciones_puentes_grua_ant_${todayISO()}.csv`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast('✓ CSV descargado (' + rows.length + ' registros)');
@@ -5897,7 +5968,7 @@ document.getElementById('fileImport').addEventListener('change', (e) => { if(e.t
 /* ============================================================
    INIT
    ============================================================ */
-const APP_VERSION = 'v11'; // subir junto con la versión del service-worker en cada entrega
+const APP_VERSION = 'v1'; // subir junto con la versión del service-worker en cada entrega
 
 async function init(){
   document.getElementById('appVersion').textContent = APP_VERSION;
